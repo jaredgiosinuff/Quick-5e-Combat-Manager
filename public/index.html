@@ -56,6 +56,43 @@
             transform: scale(0.95);
         }
 
+        .ruleset-selector {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ruleset-btn {
+            background: rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+            user-select: none;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .ruleset-btn:hover {
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-1px);
+        }
+
+        .ruleset-btn:active {
+            transform: translateY(0px) scale(0.98);
+        }
+
+        .ruleset-btn.active {
+            background: #4caf50;
+            border-color: #45a049;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.4);
+        }
+
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -881,6 +918,14 @@
             </div>
         </h1>
 
+        <!-- Ruleset Selector -->
+        <div class="ruleset-selector">
+            <button class="ruleset-btn active" id="ruleset-5e2014" onclick="switchRuleset('5e2014')">D&D 5e (2014)</button>
+            <button class="ruleset-btn" id="ruleset-5e2024" onclick="switchRuleset('5e2024')">D&D 5e (2024)</button>
+            <button class="ruleset-btn" id="ruleset-tov" onclick="switchRuleset('tov')">Tales of the Valiant</button>
+            <button class="ruleset-btn" id="ruleset-deepmagic" onclick="switchRuleset('deepmagic')">+ Deep Magic</button>
+        </div>
+
         <!-- Initiative Tracker -->
         <div class="card initiative-tracker">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -1070,6 +1115,7 @@
         let targetIdCounter = 0;
         let damageComponentIdCounter = 0;
         let displayMode = 'emoji'; // 'emoji' or 'text'
+        let currentRuleset = '5e2014'; // '5e2014', '5e2024', 'tov', 'deepmagic'
 
         // ========================================
         // ATTACK DATABASE FOR AUTOCOMPLETE
@@ -1409,6 +1455,544 @@
                 damageComponents: [{ dice: '2d8', bonus: 0, damageType: 'radiant' }],
                 saveDC: 0,
                 saveType: 'DEX'
+            },
+            // D&D 2024 - Weapon Mastery Weapons
+            {
+                name: 'Greatsword (2024-Graze)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '2d6', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Graze - On miss, deal damage = ability modifier'
+            },
+            {
+                name: 'Battleaxe (2024-Topple)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Topple - Target makes CON save or falls prone'
+            },
+            {
+                name: 'Longsword (2024-Sap)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Sap - Target has disadvantage on next attack'
+            },
+            {
+                name: 'Rapier (2024-Vex)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Vex - You gain advantage on next attack vs target'
+            },
+            {
+                name: 'Scimitar (2024-Nick)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Nick - Make extra attack as part of Attack action'
+            },
+            {
+                name: 'Greataxe (2024-Cleave)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d12', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Cleave - Hit adjacent enemy for weapon damage only'
+            },
+            {
+                name: 'Maul (2024-Topple)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '2d6', bonus: 3, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Topple - Target makes CON save or falls prone'
+            },
+            {
+                name: 'Pike (2024-Push)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d10', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Push - Push target 10ft away'
+            },
+            {
+                name: 'Longbow (2024-Slow)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Slow - Reduce target speed by 10ft until next turn'
+            },
+            {
+                name: 'Heavy Crossbow (2024-Push)',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d10', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: '2024',
+                note: 'Mastery: Push - Push target 10ft away'
+            },
+            // More Higher Level Spells
+            {
+                name: 'Cone of Cold',
+                attackBonus: 0,
+                damageComponents: [{ dice: '8d8', bonus: 0, damageType: 'cold' }],
+                saveDC: 17,
+                saveType: 'CON'
+            },
+            {
+                name: 'Chain Lightning',
+                attackBonus: 0,
+                damageComponents: [{ dice: '10d8', bonus: 0, damageType: 'lightning' }],
+                saveDC: 17,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Disintegrate',
+                attackBonus: 0,
+                damageComponents: [{ dice: '10d6', bonus: 40, damageType: 'force' }],
+                saveDC: 17,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Finger of Death',
+                attackBonus: 0,
+                damageComponents: [{ dice: '7d8', bonus: 30, damageType: 'necrotic' }],
+                saveDC: 17,
+                saveType: 'CON'
+            },
+            {
+                name: 'Meteor Swarm',
+                attackBonus: 0,
+                damageComponents: [
+                    { dice: '20d6', bonus: 0, damageType: 'fire' },
+                    { dice: '20d6', bonus: 0, damageType: 'bludgeoning' }
+                ],
+                saveDC: 19,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Ice Storm',
+                attackBonus: 0,
+                damageComponents: [
+                    { dice: '2d8', bonus: 0, damageType: 'bludgeoning' },
+                    { dice: '4d6', bonus: 0, damageType: 'cold' }
+                ],
+                saveDC: 15,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Blight',
+                attackBonus: 0,
+                damageComponents: [{ dice: '8d8', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 15,
+                saveType: 'CON'
+            },
+            {
+                name: 'Banishment',
+                attackBonus: 0,
+                damageComponents: [],
+                saveDC: 15,
+                saveType: 'CHA'
+            },
+            // DEEP MAGIC SPELLS - Popular combat spells
+            {
+                name: 'Agonizing Mark (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '2d6', bonus: 0, damageType: 'psychic' }],
+                saveDC: 13,
+                saveType: 'WIS',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Acid Arrow (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '4d4', bonus: 0, damageType: 'acid' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Black Hand (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '4d10', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 17,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Blazing Chariot (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d6', bonus: 0, damageType: 'fire' }],
+                saveDC: 13,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Chaos Bolt (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '2d8', bonus: 0, damageType: 'force' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Crimson Breath (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '4d6', bonus: 0, damageType: 'fire' }],
+                saveDC: 13,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Dark Path (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '6d6', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 15,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Death Coil (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '8d8', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 17,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Flames of Chaos (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '6d6', bonus: 0, damageType: 'fire' }],
+                saveDC: 15,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Frozen Razors (DM)',
+                attackBonus: 0,
+                damageComponents: [
+                    { dice: '2d6', bonus: 0, damageType: 'cold' },
+                    { dice: '2d6', bonus: 0, damageType: 'slashing' }
+                ],
+                saveDC: 13,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Ice Spear (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '4d8', bonus: 0, damageType: 'cold' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Lightning Storm (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '10d8', bonus: 0, damageType: 'lightning' }],
+                saveDC: 17,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Necrotic Burst (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '5d6', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 15,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Shadow Bolt (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d10', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Void Strike (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d10', bonus: 0, damageType: 'force' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Winter\'s Howl (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '6d8', bonus: 0, damageType: 'cold' }],
+                saveDC: 15,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Blood Boil (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '4d8', bonus: 0, damageType: 'fire' }],
+                saveDC: 15,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Necrotic Cyst (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '6d6', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 15,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Radiant Burst (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '5d8', bonus: 0, damageType: 'radiant' }],
+                saveDC: 15,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Toxic Blast (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '4d8', bonus: 0, damageType: 'poison' }],
+                saveDC: 15,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Thunder Strike (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d10', bonus: 0, damageType: 'thunder' }],
+                saveDC: 13,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            // Common Monster Attacks
+            {
+                name: 'Goblin Scimitar',
+                attackBonus: 4,
+                damageComponents: [{ dice: '1d6', bonus: 2, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Goblin Shortbow',
+                attackBonus: 4,
+                damageComponents: [{ dice: '1d6', bonus: 2, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Orc Greataxe',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d12', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Orc Javelin',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Kobold Dagger',
+                attackBonus: 4,
+                damageComponents: [{ dice: '1d4', bonus: 2, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Kobold Sling',
+                attackBonus: 4,
+                damageComponents: [{ dice: '1d4', bonus: 2, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Skeleton Shortsword',
+                attackBonus: 4,
+                damageComponents: [{ dice: '1d6', bonus: 2, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Skeleton Shortbow',
+                attackBonus: 4,
+                damageComponents: [{ dice: '1d6', bonus: 2, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Zombie Slam',
+                attackBonus: 3,
+                damageComponents: [{ dice: '1d6', bonus: 1, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Wolf Bite',
+                attackBonus: 4,
+                damageComponents: [{ dice: '2d4', bonus: 2, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Giant Spider Bite',
+                attackBonus: 5,
+                damageComponents: [
+                    { dice: '1d8', bonus: 3, damageType: 'piercing' },
+                    { dice: '2d8', bonus: 0, damageType: 'poison' }
+                ],
+                saveDC: 11,
+                saveType: 'CON'
+            },
+            {
+                name: 'Bugbear Morningstar',
+                attackBonus: 4,
+                damageComponents: [{ dice: '2d8', bonus: 2, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Bugbear Javelin',
+                attackBonus: 4,
+                damageComponents: [{ dice: '2d6', bonus: 2, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Ogre Greatclub',
+                attackBonus: 6,
+                damageComponents: [{ dice: '2d8', bonus: 4, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Ogre Javelin',
+                attackBonus: 6,
+                damageComponents: [{ dice: '2d6', bonus: 4, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Troll Claw',
+                attackBonus: 7,
+                damageComponents: [{ dice: '2d6', bonus: 4, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Troll Bite',
+                attackBonus: 7,
+                damageComponents: [{ dice: '2d10', bonus: 4, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Young Dragon Bite',
+                attackBonus: 7,
+                damageComponents: [
+                    { dice: '2d10', bonus: 4, damageType: 'piercing' },
+                    { dice: '1d6', bonus: 0, damageType: 'fire' }
+                ],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Young Dragon Breath',
+                attackBonus: 0,
+                damageComponents: [{ dice: '10d6', bonus: 0, damageType: 'fire' }],
+                saveDC: 17,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Adult Dragon Bite',
+                attackBonus: 11,
+                damageComponents: [
+                    { dice: '2d10', bonus: 6, damageType: 'piercing' },
+                    { dice: '2d6', bonus: 0, damageType: 'fire' }
+                ],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Adult Dragon Breath',
+                attackBonus: 0,
+                damageComponents: [{ dice: '18d6', bonus: 0, damageType: 'fire' }],
+                saveDC: 21,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Adult Dragon Claw',
+                attackBonus: 11,
+                damageComponents: [{ dice: '2d6', bonus: 6, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Adult Dragon Tail',
+                attackBonus: 11,
+                damageComponents: [{ dice: '2d8', bonus: 6, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            // More Deep Magic Cantrips
+            {
+                name: 'Acidic Spray (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'acid' }],
+                saveDC: 13,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Blazing Beam (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d10', bonus: 0, damageType: 'fire' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Frost Fingers (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'cold' }],
+                saveDC: 13,
+                saveType: 'CON',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Necrotic Touch (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
+            },
+            {
+                name: 'Radiant Lance (DM)',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'radiant' }],
+                saveDC: 0,
+                saveType: 'DEX',
+                ruleset: 'deepmagic'
             }
         ];
 
@@ -1492,6 +2076,46 @@
             saveState();
         }
 
+        function switchRuleset(ruleset) {
+            currentRuleset = ruleset;
+
+            // Update button states
+            document.querySelectorAll('.ruleset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`ruleset-${ruleset}`).classList.add('active');
+
+            // Save to localStorage
+            localStorage.setItem('currentRuleset', ruleset);
+
+            // Note: Attack database is already loaded, autocomplete will filter based on currentRuleset
+            console.log(`Switched to ruleset: ${ruleset}`);
+        }
+
+        function getFilteredAttackDatabase() {
+            // Return attacks that match current ruleset or are universal
+            if (currentRuleset === '5e2014') {
+                // Show everything except ruleset-specific items
+                return ATTACK_DATABASE.filter(attack =>
+                    !attack.ruleset || attack.ruleset === '5e2014'
+                );
+            } else if (currentRuleset === '5e2024') {
+                // Show 2014 base + 2024 specific
+                return ATTACK_DATABASE.filter(attack =>
+                    !attack.ruleset || attack.ruleset === '5e2014' || attack.ruleset === '2024'
+                );
+            } else if (currentRuleset === 'tov') {
+                // Show 2014 base + ToV specific
+                return ATTACK_DATABASE.filter(attack =>
+                    !attack.ruleset || attack.ruleset === '5e2014' || attack.ruleset === 'tov'
+                );
+            } else if (currentRuleset === 'deepmagic') {
+                // Show everything
+                return ATTACK_DATABASE;
+            }
+            return ATTACK_DATABASE;
+        }
+
         function getDamageTypeDisplay(damageType) {
             if (displayMode === 'emoji') {
                 return DAMAGE_TYPE_EMOJI[damageType] || damageType;
@@ -1540,9 +2164,10 @@
         function findAttackMatches(input) {
             if (!input) return [];
             const lowerInput = input.toLowerCase();
-            return ATTACK_DATABASE.filter(attack =>
-                attack.name.toLowerCase().startsWith(lowerInput)
-            ).slice(0, 5); // Limit to 5 suggestions
+            const filteredDB = getFilteredAttackDatabase();
+            return filteredDB.filter(attack =>
+                attack.name.toLowerCase().includes(lowerInput)
+            ).slice(0, 10); // Show more suggestions for better UX
         }
 
         function applyAttackTemplate(attackId, template, type = 'character', minionId = null) {
@@ -3225,6 +3850,19 @@ Tips:
         // ========================================
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Load saved ruleset preference
+            const savedRuleset = localStorage.getItem('currentRuleset');
+            if (savedRuleset) {
+                currentRuleset = savedRuleset;
+                document.querySelectorAll('.ruleset-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                const btn = document.getElementById(`ruleset-${savedRuleset}`);
+                if (btn) {
+                    btn.classList.add('active');
+                }
+            }
+
             loadState();
 
             if (characterAttacks.length === 0) {
