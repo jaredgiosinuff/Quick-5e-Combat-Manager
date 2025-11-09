@@ -2199,8 +2199,12 @@
         }
 
         function applyAttackTemplate(attackId, template, type = 'character', minionId = null) {
+            console.log('applyAttackTemplate called with:', { attackId, template, type, minionId });
+
             if (type === 'character') {
                 const attack = characterAttacks.find(a => a.id === attackId);
+                console.log('Found character attack:', attack);
+
                 if (attack) {
                     attack.name = template.name;
                     attack.attackBonus = template.attackBonus;
@@ -2215,13 +2219,19 @@
                         damageType: comp.damageType
                     }));
 
+                    console.log('Attack after template applied:', attack);
+
                     renderCharacterAttacks();
                     saveState();
                 }
             } else {
                 const minion = minions.find(m => m.id === minionId);
+                console.log('Found minion:', minion);
+
                 if (minion) {
                     const attack = minion.attacks.find(a => a.id === attackId);
+                    console.log('Found minion attack:', attack);
+
                     if (attack) {
                         attack.name = template.name;
                         attack.attackBonus = template.attackBonus;
@@ -2235,6 +2245,8 @@
                             bonus: comp.bonus,
                             damageType: comp.damageType
                         }));
+
+                        console.log('Minion attack after template applied:', attack);
 
                         renderMinions();
                         saveState();
@@ -2282,18 +2294,33 @@
         }
 
         function selectAutocompleteByData(element) {
-            const attackName = element.getAttribute('data-attack-name');
-            const attackId = parseInt(element.getAttribute('data-attack-id'));
-            const type = element.getAttribute('data-attack-type');
-            const minionId = element.getAttribute('data-minion-id') !== 'null' ? parseInt(element.getAttribute('data-minion-id')) : null;
+            // Handle clicks on child elements by finding the parent autocomplete-item
+            const item = element.closest('.autocomplete-item');
+            if (!item) {
+                console.error('Could not find autocomplete item');
+                return;
+            }
+
+            const attackName = item.getAttribute('data-attack-name');
+            const attackId = parseInt(item.getAttribute('data-attack-id'));
+            const type = item.getAttribute('data-attack-type');
+            const minionId = item.getAttribute('data-minion-id') !== 'null' ? parseInt(item.getAttribute('data-minion-id')) : null;
+
+            console.log('Autocomplete clicked:', { attackName, attackId, type, minionId });
 
             selectAutocomplete(attackName, attackId, type, minionId);
         }
 
         function selectAutocomplete(attackName, attackId, type = 'character', minionId = null) {
             const template = ATTACK_DATABASE.find(a => a.name === attackName);
+
+            console.log('Looking for template:', attackName);
+            console.log('Found template:', template);
+
             if (template) {
                 applyAttackTemplate(attackId, template, type, minionId);
+            } else {
+                console.error('Template not found for:', attackName);
             }
 
             // Hide all dropdowns
