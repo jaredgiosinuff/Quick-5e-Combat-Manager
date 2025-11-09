@@ -2255,8 +2255,17 @@
             }
         }
 
+        // Global flag to disable autocomplete temporarily when applying templates
+        let autocompleteDisabled = false;
+
         function handleAttackNameInput(event, attackId, type = 'character', minionId = null) {
             console.log('🔍 handleAttackNameInput called - input:', event.target.value);
+
+            // Skip autocomplete if disabled (e.g., when applying template)
+            if (autocompleteDisabled) {
+                console.log('⏸️  Autocomplete disabled - skipping');
+                return;
+            }
 
             const input = event.target.value;
             const matches = findAttackMatches(input);
@@ -2304,13 +2313,21 @@
                         console.log('Minion ID:', minionId);
                         console.log('========================================');
 
-                        // Hide dropdown IMMEDIATELY before applying template
+                        // Hide dropdown IMMEDIATELY
                         dropdown.style.display = 'none';
 
-                        // Apply template on next tick to ensure dropdown is hidden first
+                        // Disable autocomplete to prevent it from showing again during template application
+                        autocompleteDisabled = true;
+                        console.log('🚫 Autocomplete disabled');
+
+                        // Apply template
+                        selectAutocomplete(match.name, attackId, type, minionId);
+
+                        // Re-enable autocomplete after a short delay
                         setTimeout(function() {
-                            selectAutocomplete(match.name, attackId, type, minionId);
-                        }, 0);
+                            autocompleteDisabled = false;
+                            console.log('✅ Autocomplete re-enabled');
+                        }, 100);
                     });
 
                     dropdown.appendChild(item);
