@@ -346,7 +346,7 @@
             background: #f8f9fa;
             border: 1px solid #ddd;
             border-radius: 2px;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             transition: all 0.15s;
         }
 
@@ -424,7 +424,7 @@
 
         .attack-details {
             display: none;
-            padding: 4px;
+            padding: 2px 4px;
             border-top: 1px solid #e0e0e0;
             background: white;
         }
@@ -453,34 +453,34 @@
 
         .advantage-selector {
             display: flex;
-            gap: 6px;
-            margin: 3px 0;
+            gap: 4px;
+            margin: 2px 0;
             font-size: 10px;
         }
 
         .advantage-selector label {
             display: flex;
             align-items: center;
-            gap: 2px;
+            gap: 1px;
             cursor: pointer;
         }
 
         .advantage-selector input[type="radio"] {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
         }
 
         .damage-components {
             background: #fff;
             border: 1px solid #dee2e6;
             border-radius: 2px;
-            padding: 3px;
-            margin: 3px 0;
+            padding: 2px;
+            margin: 2px 0;
         }
 
         .damage-components h4 {
             color: #495057;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
             font-size: 8px;
             display: flex;
             justify-content: space-between;
@@ -493,8 +493,8 @@
             display: grid;
             grid-template-columns: 55px 50px 90px auto;
             gap: 4px;
-            margin-bottom: 3px;
-            padding: 3px;
+            margin-bottom: 2px;
+            padding: 2px;
             background: #f8f9fa;
             border-radius: 2px;
             align-items: end;
@@ -505,7 +505,7 @@
             display: grid;
             grid-template-columns: 50px 50px 50px 65px;
             gap: 4px;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .damage-type-badge {
@@ -535,7 +535,7 @@
         .attack-actions {
             display: flex;
             gap: 3px;
-            margin-top: 4px;
+            margin-top: 2px;
             flex-wrap: wrap;
         }
 
@@ -2261,10 +2261,14 @@
                     const saveInfo = match.saveDC > 0 ? `DC${match.saveDC} ${match.saveType}` : '';
                     const hitInfo = match.attackBonus !== 0 ? `+${match.attackBonus} to hit` : '';
                     const details = [hitInfo, damageSummary, saveInfo].filter(x => x).join(' | ');
-                    const escapedName = match.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                     return `
-                        <div class="autocomplete-item" onclick="event.stopPropagation(); selectAutocomplete('${escapedName}', ${attackId}, '${type}', ${minionId})">
+                        <div class="autocomplete-item"
+                             data-attack-name="${match.name.replace(/"/g, '&quot;')}"
+                             data-attack-id="${attackId}"
+                             data-attack-type="${type}"
+                             data-minion-id="${minionId}"
+                             onclick="event.stopPropagation(); selectAutocompleteByData(this)">
                             <div class="autocomplete-item-name">${match.name}</div>
                             <div class="autocomplete-item-details">${details}</div>
                         </div>
@@ -2275,6 +2279,15 @@
             } else {
                 dropdown.style.display = 'none';
             }
+        }
+
+        function selectAutocompleteByData(element) {
+            const attackName = element.getAttribute('data-attack-name');
+            const attackId = parseInt(element.getAttribute('data-attack-id'));
+            const type = element.getAttribute('data-attack-type');
+            const minionId = element.getAttribute('data-minion-id') !== 'null' ? parseInt(element.getAttribute('data-minion-id')) : null;
+
+            selectAutocomplete(attackName, attackId, type, minionId);
         }
 
         function selectAutocomplete(attackName, attackId, type = 'character', minionId = null) {
@@ -2525,7 +2538,7 @@
                         <div class="expand-icon">▼</div>
                     </div>
                     <div class="attack-details">
-                        <div style="position: relative; margin-bottom: 8px;">
+                        <div style="position: relative; margin-bottom: 3px;">
                             <input type="text"
                                    value="${attack.name}"
                                    placeholder="Attack Name (type to autocomplete)"
@@ -2822,7 +2835,7 @@
                                 <div class="expand-icon">▼</div>
                             </div>
                             <div class="attack-details">
-                                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                                <div style="display: flex; gap: 6px; margin-bottom: 3px;">
                                     <input type="text"
                                            value="${attack.minionIdentifier || ''}"
                                            placeholder="#1"
