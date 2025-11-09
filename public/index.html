@@ -222,6 +222,31 @@
             line-height: 1.2;
         }
 
+        /* Compact numeric inputs for small numbers (max 3 digits: 999) */
+        input[type="number"].compact-num {
+            max-width: 50px;
+            text-align: center;
+            padding: 2px 3px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Dice notation input (e.g., 2d6) */
+        input.dice-input {
+            max-width: 55px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            padding: 2px 3px;
+        }
+
+        /* Damage type select - more compact */
+        select.damage-type-select {
+            font-size: 10px;
+            padding: 2px 4px;
+            max-width: 90px;
+        }
+
         input[type="text"]:focus,
         input[type="number"]:focus,
         select:focus {
@@ -412,24 +437,18 @@
             transform: rotate(180deg);
         }
 
-        .attack-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 3px;
-            margin-bottom: 4px;
-        }
-
         .form-group {
             display: flex;
             flex-direction: column;
         }
 
         .form-group label {
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 600;
             color: #666;
             margin-bottom: 1px;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .advantage-selector {
@@ -455,29 +474,38 @@
             background: #fff;
             border: 1px solid #dee2e6;
             border-radius: 2px;
-            padding: 4px;
-            margin: 4px 0;
+            padding: 3px;
+            margin: 3px 0;
         }
 
         .damage-components h4 {
             color: #495057;
-            margin-bottom: 3px;
-            font-size: 9px;
+            margin-bottom: 2px;
+            font-size: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .damage-component {
             display: grid;
-            grid-template-columns: 2fr 1fr 2fr auto;
-            gap: 3px;
+            grid-template-columns: 55px 50px 90px auto;
+            gap: 4px;
             margin-bottom: 3px;
             padding: 3px;
             background: #f8f9fa;
             border-radius: 2px;
             align-items: end;
+        }
+
+        /* Compact attack grid for better density */
+        .attack-grid {
+            display: grid;
+            grid-template-columns: 50px 50px 50px 65px;
+            gap: 4px;
+            margin-bottom: 4px;
         }
 
         .damage-type-badge {
@@ -2358,14 +2386,18 @@
                     ${attack.damageComponents.map(comp => `
                         <div class="damage-component">
                             <input type="text"
+                                   class="dice-input"
                                    value="${comp.dice}"
                                    placeholder="2d6"
                                    onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'dice', this.value, '${attackType}', ${minionId})">
                             <input type="number"
+                                   class="compact-num"
                                    value="${comp.bonus}"
                                    placeholder="+0"
+                                   min="-999"
+                                   max="999"
                                    onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'bonus', parseInt(this.value), '${attackType}', ${minionId})">
-                            <select onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'damageType', this.value, '${attackType}', ${minionId})">
+                            <select class="damage-type-select" onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'damageType', this.value, '${attackType}', ${minionId})">
                                 ${DAMAGE_TYPES.map(dt => `<option value="${dt}" ${comp.damageType === dt ? 'selected' : ''}>${dt.charAt(0).toUpperCase() + dt.slice(1)}</option>`).join('')}
                             </select>
                             <button class="btn-danger btn-small" onclick="removeDamageComponent(${attack.id}, ${comp.id}, '${attackType}', ${minionId})">×</button>
@@ -2507,28 +2539,35 @@
                             <div class="form-group">
                                 <label>To Hit</label>
                                 <input type="number"
+                                       class="compact-num"
                                        value="${attack.attackBonus}"
+                                       min="-99"
+                                       max="999"
                                        onchange="updateCharacterAttack(${attack.id}, 'attackBonus', parseInt(this.value))"
                                        onclick="event.stopPropagation()">
                             </div>
                             <div class="form-group">
                                 <label>× Count</label>
                                 <input type="number"
+                                       class="compact-num"
                                        value="${attack.rollCount || 1}"
                                        min="1"
-                                       max="10"
+                                       max="999"
                                        onchange="updateCharacterAttack(${attack.id}, 'rollCount', parseInt(this.value) || 1)"
                                        onclick="event.stopPropagation()">
                             </div>
                             <div class="form-group">
                                 <label>Save DC</label>
                                 <input type="number"
+                                       class="compact-num"
                                        value="${attack.saveDC}"
+                                       min="0"
+                                       max="999"
                                        onchange="updateCharacterAttack(${attack.id}, 'saveDC', parseInt(this.value))"
                                        onclick="event.stopPropagation()">
                             </div>
                             <div class="form-group">
-                                <label>Save Type</label>
+                                <label>Save</label>
                                 <select onchange="updateCharacterAttack(${attack.id}, 'saveType', this.value)" onclick="event.stopPropagation()">
                                     <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
                                     <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
@@ -2805,23 +2844,30 @@
                                     <div class="form-group">
                                         <label>To Hit</label>
                                         <input type="number"
+                                               class="compact-num"
                                                value="${attack.attackBonus}"
+                                               min="-99"
+                                               max="999"
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'attackBonus', parseInt(this.value))"
                                                onclick="event.stopPropagation()">
                                     </div>
                                     <div class="form-group">
                                         <label>× Count</label>
                                         <input type="number"
+                                               class="compact-num"
                                                value="${attack.rollCount || 1}"
                                                min="1"
-                                               max="10"
+                                               max="999"
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'rollCount', parseInt(this.value) || 1)"
                                                onclick="event.stopPropagation()">
                                     </div>
                                     <div class="form-group">
                                         <label>Save DC</label>
                                         <input type="number"
+                                               class="compact-num"
                                                value="${attack.saveDC}"
+                                               min="0"
+                                               max="999"
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveDC', parseInt(this.value))"
                                                onclick="event.stopPropagation()">
                                     </div>
