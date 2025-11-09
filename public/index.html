@@ -2313,6 +2313,12 @@
                         console.log('Minion ID:', minionId);
                         console.log('========================================');
 
+                        // Update the input field value FIRST, before applying template
+                        // This prevents onchange from overwriting our selection later
+                        const inputField = event.target;
+                        inputField.value = match.name;
+                        console.log('📝 Updated input field to:', match.name);
+
                         // Hide dropdown IMMEDIATELY
                         dropdown.style.display = 'none';
 
