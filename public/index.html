@@ -2,61 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quick 5e Combat Manager</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
             color: #333;
+            font-size: 14px;
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
         h1 {
             color: white;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            font-size: 2.5em;
+            font-size: 1.5em;
         }
 
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .card h2 {
             color: #2a5298;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            border-bottom: 3px solid #2a5298;
-            padding-bottom: 10px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #2a5298;
+            padding-bottom: 5px;
         }
 
         .combat-log-card {
             grid-column: 1 / -1;
-            max-height: 600px;
+            max-height: 400px;
             display: flex;
             flex-direction: column;
         }
@@ -65,26 +67,28 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .log-controls {
             display: flex;
-            gap: 10px;
+            gap: 5px;
         }
 
         .results-container {
             flex: 1;
             overflow-y: auto;
-            max-height: 500px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 15px;
+            max-height: 350px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 8px;
             background: #f9f9f9;
         }
 
         .results-container::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
 
         .results-container::-webkit-scrollbar-track {
@@ -97,19 +101,15 @@
             border-radius: 10px;
         }
 
-        .results-container::-webkit-scrollbar-thumb:hover {
-            background: #1e3c72;
-        }
-
         input[type="text"],
         input[type="number"],
         select {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
             width: 100%;
-            transition: border-color 0.3s;
+            transition: border-color 0.2s;
         }
 
         input[type="text"]:focus,
@@ -120,24 +120,26 @@
         }
 
         .character-name-input {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .character-name-input label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             font-weight: bold;
             color: #2a5298;
+            font-size: 12px;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 8px 12px;
             border: none;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            touch-action: manipulation;
         }
 
         .btn-primary {
@@ -145,10 +147,9 @@
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn-primary:active {
             background: #1e3c72;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: scale(0.98);
         }
 
         .btn-success {
@@ -156,10 +157,9 @@
             color: white;
         }
 
-        .btn-success:hover {
+        .btn-success:active {
             background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: scale(0.98);
         }
 
         .btn-danger {
@@ -167,7 +167,7 @@
             color: white;
         }
 
-        .btn-danger:hover {
+        .btn-danger:active {
             background: #c82333;
         }
 
@@ -176,17 +176,9 @@
             color: #333;
         }
 
-        .btn-warning:hover {
-            background: #e0a800;
-        }
-
         .btn-info {
             background: #17a2b8;
             color: white;
-        }
-
-        .btn-info:hover {
-            background: #138496;
         }
 
         .btn-secondary {
@@ -194,70 +186,125 @@
             color: white;
         }
 
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
         .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
+            padding: 4px 8px;
+            font-size: 11px;
         }
 
         .btn-large {
-            padding: 15px 30px;
-            font-size: 18px;
-            margin: 10px 5px;
+            padding: 12px 20px;
+            font-size: 15px;
+            margin: 5px 2px;
+            min-height: 44px;
         }
 
         .batch-controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 5px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
-        .attack-item, .minion-item {
+        /* COMPACT ATTACK CARDS */
+        .attack-item {
             background: #f8f9fa;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
         }
 
         .attack-item.selected {
             background: #e3f2fd;
             border-color: #2a5298;
-            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+            box-shadow: 0 0 0 2px rgba(42, 82, 152, 0.1);
         }
 
-        .minion-item {
-            background: #fff3e0;
-            border-color: #ffb74d;
-        }
-
-        .attack-header {
+        .attack-compact {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            padding: 8px;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .attack-compact:active {
+            background: rgba(0,0,0,0.03);
         }
 
         .attack-checkbox {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
-        .attack-name-wrapper {
+        .attack-info {
             flex: 1;
+            min-width: 0;
+            font-size: 13px;
+        }
+
+        .attack-name {
+            font-weight: bold;
+            color: #2a5298;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .attack-stats {
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .stat-hit { background: #c8e6c9; color: #2e7d32; }
+        .stat-dmg { background: #ffccbc; color: #d84315; }
+        .stat-save { background: #e1bee7; color: #6a1b9a; }
+
+        .expand-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #999;
+        }
+
+        .attack-details {
+            display: none;
+            padding: 8px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .attack-item.expanded .attack-details {
+            display: block;
+        }
+
+        .attack-item.expanded .expand-icon {
+            transform: rotate(180deg);
         }
 
         .attack-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 6px;
+            margin-bottom: 8px;
         }
 
         .form-group {
@@ -266,65 +313,66 @@
         }
 
         .form-group label {
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
             color: #666;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
+            text-transform: uppercase;
         }
 
         .advantage-selector {
             display: flex;
-            gap: 15px;
-            align-items: center;
-            margin: 10px 0;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 12px;
         }
 
         .advantage-selector label {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             cursor: pointer;
         }
 
         .advantage-selector input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
+            width: 16px;
+            height: 16px;
         }
 
         .damage-components {
             background: #fff;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 8px;
+            margin: 8px 0;
         }
 
         .damage-components h4 {
             color: #495057;
-            margin-bottom: 12px;
-            font-size: 14px;
+            margin-bottom: 6px;
+            font-size: 11px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            text-transform: uppercase;
         }
 
         .damage-component {
             display: grid;
             grid-template-columns: 2fr 1fr 2fr auto;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding: 10px;
+            gap: 6px;
+            margin-bottom: 6px;
+            padding: 6px;
             background: #f8f9fa;
-            border-radius: 6px;
+            border-radius: 4px;
             align-items: end;
         }
 
         .damage-type-badge {
             display: inline-block;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
             font-weight: bold;
             margin: 2px;
             color: white;
@@ -346,18 +394,26 @@
 
         .attack-actions {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 6px;
+            margin-top: 8px;
             flex-wrap: wrap;
+        }
+
+        .minion-item {
+            background: #fff3e0;
+            border: 2px solid #ffb74d;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
         }
 
         .result-item {
             background: white;
-            border-left: 4px solid #28a745;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            animation: slideIn 0.3s ease-out;
+            border-left: 3px solid #28a745;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
         }
 
         .result-item.critical-success {
@@ -372,89 +428,93 @@
 
         .result-header {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 13px;
             color: #2a5298;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .result-timestamp {
-            font-size: 12px;
+            font-size: 10px;
             color: #999;
             font-weight: normal;
         }
 
         .result-detail {
-            margin: 5px 0;
-            font-size: 14px;
+            margin: 4px 0;
+            font-size: 12px;
         }
 
         .damage-breakdown {
             background: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 10px 0;
+            padding: 6px;
+            border-radius: 4px;
+            margin: 6px 0;
         }
 
         .damage-type-result {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 6px 0;
-            padding: 6px;
+            margin: 4px 0;
+            padding: 4px;
             background: white;
-            border-radius: 4px;
+            border-radius: 3px;
+            font-size: 11px;
         }
 
         .damage-total {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             color: #dc3545;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 2px solid #dee2e6;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #dee2e6;
         }
 
         .dice-result {
             display: inline-block;
             background: #2a5298;
             color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            margin: 0 2px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 0 1px;
             font-weight: bold;
+            font-size: 11px;
         }
 
         .empty-state {
             text-align: center;
             color: #999;
-            padding: 40px;
+            padding: 20px;
             font-style: italic;
+            font-size: 12px;
         }
 
         .quick-dice-roller {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #e0e0e0;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
         }
 
         .quick-dice-roller h3 {
-            margin-bottom: 15px;
+            margin-bottom: 6px;
             color: #2a5298;
+            font-size: 13px;
         }
 
         .dice-buttons {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             flex-wrap: wrap;
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateX(-20px);
+                transform: translateX(-10px);
             }
             to {
                 opacity: 1;
@@ -468,79 +528,72 @@
             }
 
             h1 {
-                font-size: 1.8em;
-            }
-
-            .attack-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .batch-controls {
-                flex-direction: column;
-            }
-
-            .batch-controls button {
-                width: 100%;
+                font-size: 1.2em;
             }
 
             .damage-component {
                 grid-template-columns: 1fr;
+            }
+
+            .batch-controls button {
+                flex: 1;
+                min-width: 120px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚔️ Quick 5e Combat Manager ⚔️</h1>
+        <h1>⚔️ Quick 5e Combat</h1>
 
         <div class="main-grid">
             <!-- Character Section -->
             <div class="card">
-                <h2>Character Attacks</h2>
+                <h2>Character</h2>
 
                 <div class="character-name-input">
-                    <label for="characterName">Character Name:</label>
-                    <input type="text" id="characterName" placeholder="Enter character name" onchange="saveCharacterName()">
+                    <label for="characterName">Name:</label>
+                    <input type="text" id="characterName" placeholder="Character name" onchange="saveCharacterName()">
                 </div>
 
                 <div class="batch-controls">
-                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('character')">🎲 Roll Selected</button>
-                    <button class="btn-info" onclick="repeatLastRoll()">🔄 Repeat Last</button>
-                    <button class="btn-secondary" onclick="selectAllAttacks('character', true)">☑️ Select All</button>
-                    <button class="btn-secondary" onclick="selectAllAttacks('character', false)">☐ Deselect All</button>
+                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('character')" style="flex: 1;">🎲 Roll</button>
+                    <button class="btn-info" onclick="repeatLastRoll()">🔄</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', true)">All</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', false)">None</button>
                 </div>
 
                 <div id="characterAttacks"></div>
 
-                <button class="btn-primary" onclick="addCharacterAttack()">➕ Add Attack</button>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addCharacterAttack()">➕ Add Attack</button>
 
                 <div class="quick-dice-roller">
-                    <h3>Quick Dice Roller</h3>
+                    <h3>Quick Roll</h3>
                     <div class="dice-buttons">
-                        <button class="btn-info" onclick="rollQuickDice('d4')">d4</button>
-                        <button class="btn-info" onclick="rollQuickDice('d6')">d6</button>
-                        <button class="btn-info" onclick="rollQuickDice('d8')">d8</button>
-                        <button class="btn-info" onclick="rollQuickDice('d10')">d10</button>
-                        <button class="btn-info" onclick="rollQuickDice('d12')">d12</button>
-                        <button class="btn-info" onclick="rollQuickDice('d20')">d20</button>
-                        <button class="btn-info" onclick="rollQuickDice('d100')">d100</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d4')">d4</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d6')">d6</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d8')">d8</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d10')">d10</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d12')">d12</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d20')">d20</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d100')">d100</button>
                     </div>
                 </div>
             </div>
 
             <!-- Minions Section -->
             <div class="card">
-                <h2>Minion Groups</h2>
+                <h2>Minions</h2>
 
                 <div class="batch-controls">
-                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('minions')">🎲 Roll Selected Minions</button>
-                    <button class="btn-secondary" onclick="selectAllAttacks('minions', true)">☑️ Select All</button>
-                    <button class="btn-secondary" onclick="selectAllAttacks('minions', false)">☐ Deselect All</button>
+                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('minions')" style="flex: 1;">🎲 Roll</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', true)">All</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', false)">None</button>
                 </div>
 
                 <div id="minions"></div>
 
-                <button class="btn-primary" onclick="addMinion()">➕ Add Minion Group</button>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addMinion()">➕ Add Group</button>
             </div>
 
             <!-- Combat Log -->
@@ -548,12 +601,12 @@
                 <div class="log-header">
                     <h2>Combat Log</h2>
                     <div class="log-controls">
-                        <button class="btn-warning" onclick="exportLog()">💾 Export Log</button>
-                        <button class="btn-danger" onclick="clearResults()">🗑️ Clear Log</button>
+                        <button class="btn-warning btn-small" onclick="exportLog()">💾</button>
+                        <button class="btn-danger btn-small" onclick="clearResults()">🗑️</button>
                     </div>
                 </div>
                 <div class="results-container" id="results">
-                    <div class="empty-state">No rolls yet. Select attacks and click "Roll Selected"!</div>
+                    <div class="empty-state">No rolls yet. Select attacks and click Roll!</div>
                 </div>
             </div>
         </div>
@@ -565,19 +618,9 @@
         // ========================================
 
         const DAMAGE_TYPES = [
-            'slashing',
-            'piercing',
-            'bludgeoning',
-            'poison',
-            'acid',
-            'fire',
-            'cold',
-            'radiant',
-            'necrotic',
-            'lightning',
-            'thunder',
-            'force',
-            'psychic'
+            'slashing', 'piercing', 'bludgeoning',
+            'poison', 'acid', 'fire', 'cold', 'radiant', 'necrotic',
+            'lightning', 'thunder', 'force', 'psychic'
         ];
 
         // ========================================
@@ -654,6 +697,24 @@
         }
 
         // ========================================
+        // UI HELPERS
+        // ========================================
+
+        function toggleExpand(attackId, type = 'character') {
+            const element = document.querySelector(`[data-attack-id="${attackId}"]`);
+            if (element) {
+                element.classList.toggle('expanded');
+            }
+        }
+
+        function getDamageSummary(damageComponents) {
+            return damageComponents.map(c => {
+                const bonus = c.bonus !== 0 ? (c.bonus > 0 ? `+${c.bonus}` : c.bonus) : '';
+                return `${c.dice}${bonus} ${c.damageType.substring(0,3)}`;
+            }).join(' + ');
+        }
+
+        // ========================================
         // DAMAGE COMPONENT FUNCTIONS
         // ========================================
 
@@ -711,6 +772,7 @@
                     const component = attack.damageComponents.find(c => c.id === componentId);
                     if (component) {
                         component[field] = value;
+                        renderCharacterAttacks();
                         saveState();
                     }
                 }
@@ -722,6 +784,7 @@
                         const component = attack.damageComponents.find(c => c.id === componentId);
                         if (component) {
                             component[field] = value;
+                            renderMinions();
                             saveState();
                         }
                     }
@@ -733,34 +796,25 @@
             return `
                 <div class="damage-components">
                     <h4>
-                        <span>💥 Damage Components</span>
-                        <button class="btn-primary btn-small" onclick="addDamageComponent(${attack.id}, '${attackType}', ${minionId})">➕ Add Damage</button>
+                        <span>Damage</span>
+                        <button class="btn-primary btn-small" onclick="addDamageComponent(${attack.id}, '${attackType}', ${minionId})">+ Add</button>
                     </h4>
                     ${attack.damageComponents.map(comp => `
                         <div class="damage-component">
-                            <div class="form-group">
-                                <label>Dice</label>
-                                <input type="text"
-                                       value="${comp.dice}"
-                                       placeholder="e.g., 2d6"
-                                       onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'dice', this.value, '${attackType}', ${minionId})">
-                            </div>
-                            <div class="form-group">
-                                <label>Bonus</label>
-                                <input type="number"
-                                       value="${comp.bonus}"
-                                       onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'bonus', parseInt(this.value), '${attackType}', ${minionId})">
-                            </div>
-                            <div class="form-group">
-                                <label>Damage Type</label>
-                                <select onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'damageType', this.value, '${attackType}', ${minionId})">
-                                    ${DAMAGE_TYPES.map(dt => `<option value="${dt}" ${comp.damageType === dt ? 'selected' : ''}>${dt.charAt(0).toUpperCase() + dt.slice(1)}</option>`).join('')}
-                                </select>
-                            </div>
-                            <button class="btn-danger btn-small" onclick="removeDamageComponent(${attack.id}, ${comp.id}, '${attackType}', ${minionId})">🗑️</button>
+                            <input type="text"
+                                   value="${comp.dice}"
+                                   placeholder="2d6"
+                                   onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'dice', this.value, '${attackType}', ${minionId})">
+                            <input type="number"
+                                   value="${comp.bonus}"
+                                   placeholder="+0"
+                                   onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'bonus', parseInt(this.value), '${attackType}', ${minionId})">
+                            <select onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'damageType', this.value, '${attackType}', ${minionId})">
+                                ${DAMAGE_TYPES.map(dt => `<option value="${dt}" ${comp.damageType === dt ? 'selected' : ''}>${dt.charAt(0).toUpperCase() + dt.slice(1)}</option>`).join('')}
+                            </select>
+                            <button class="btn-danger btn-small" onclick="removeDamageComponent(${attack.id}, ${comp.id}, '${attackType}', ${minionId})">×</button>
                         </div>
                     `).join('')}
-                    ${attack.damageComponents.length === 0 ? '<p class="empty-state" style="padding: 15px; margin: 0;">No damage components. Add one to get started!</p>' : ''}
                 </div>
             `;
         }
@@ -783,7 +837,8 @@
                 saveDC: 0,
                 saveType: 'DEX',
                 advantage: 'normal',
-                selected: false
+                selected: false,
+                expanded: true
             };
             characterAttacks.push(attack);
             renderCharacterAttacks();
@@ -801,6 +856,8 @@
             if (attack) {
                 attack[field] = value;
                 if (field === 'selected') {
+                    renderCharacterAttacks();
+                } else if (['name', 'attackBonus', 'damageComponents'].includes(field)) {
                     renderCharacterAttacks();
                 }
                 saveState();
@@ -832,91 +889,95 @@
         function renderCharacterAttacks() {
             const container = document.getElementById('characterAttacks');
             if (characterAttacks.length === 0) {
-                container.innerHTML = '<p class="empty-state">No attacks yet. Add one to get started!</p>';
+                container.innerHTML = '<p class="empty-state">No attacks yet</p>';
                 return;
             }
 
-            container.innerHTML = characterAttacks.map(attack => `
-                <div class="attack-item ${attack.selected ? 'selected' : ''}" data-attack-id="${attack.id}">
-                    <div class="attack-header">
+            container.innerHTML = characterAttacks.map(attack => {
+                const damageSummary = getDamageSummary(attack.damageComponents);
+                return `
+                <div class="attack-item ${attack.selected ? 'selected' : ''} ${attack.expanded ? 'expanded' : ''}" data-attack-id="${attack.id}">
+                    <div class="attack-compact" onclick="toggleExpand(${attack.id}, 'character')">
                         <input type="checkbox"
                                class="attack-checkbox"
                                ${attack.selected ? 'checked' : ''}
-                               onchange="toggleAttackSelection(${attack.id}, 'character')">
-                        <div class="attack-name-wrapper">
-                            <input type="text"
-                                   value="${attack.name}"
-                                   placeholder="Attack Name"
-                                   onchange="updateCharacterAttack(${attack.id}, 'name', this.value)">
+                               onclick="event.stopPropagation(); toggleAttackSelection(${attack.id}, 'character')">
+                        <div class="attack-info">
+                            <div class="attack-name">${attack.name}</div>
+                            <div class="attack-stats">
+                                <span class="stat-badge stat-hit">+${attack.attackBonus}</span>
+                                <span class="stat-badge stat-dmg">${damageSummary}</span>
+                                ${attack.saveDC > 0 ? `<span class="stat-badge stat-save">DC${attack.saveDC} ${attack.saveType}</span>` : ''}
+                            </div>
                         </div>
+                        <div class="expand-icon">▼</div>
                     </div>
+                    <div class="attack-details">
+                        <input type="text"
+                               value="${attack.name}"
+                               placeholder="Attack Name"
+                               style="margin-bottom: 8px; font-weight: bold;"
+                               onchange="updateCharacterAttack(${attack.id}, 'name', this.value)"
+                               onclick="event.stopPropagation()">
 
-                    <div style="background: #e8f5e9; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; gap: 15px; align-items: center; font-weight: bold;">
-                        <span style="color: #2e7d32;">⚔️ To Hit: +${attack.attackBonus}</span>
-                        ${attack.saveDC > 0 ? `<span style="color: #c62828;">🛡️ Save DC: ${attack.saveDC} ${attack.saveType}</span>` : ''}
-                    </div>
-
-                    <div class="attack-grid">
-                        <div class="form-group">
-                            <label>Attack Bonus</label>
-                            <input type="number"
-                                   value="${attack.attackBonus}"
-                                   onchange="updateCharacterAttack(${attack.id}, 'attackBonus', parseInt(this.value))">
+                        <div class="attack-grid">
+                            <div class="form-group">
+                                <label>To Hit</label>
+                                <input type="number"
+                                       value="${attack.attackBonus}"
+                                       onchange="updateCharacterAttack(${attack.id}, 'attackBonus', parseInt(this.value))"
+                                       onclick="event.stopPropagation()">
+                            </div>
+                            <div class="form-group">
+                                <label>Save DC</label>
+                                <input type="number"
+                                       value="${attack.saveDC}"
+                                       onchange="updateCharacterAttack(${attack.id}, 'saveDC', parseInt(this.value))"
+                                       onclick="event.stopPropagation()">
+                            </div>
+                            <div class="form-group">
+                                <label>Save Type</label>
+                                <select onchange="updateCharacterAttack(${attack.id}, 'saveType', this.value)" onclick="event.stopPropagation()">
+                                    <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
+                                    <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
+                                    <option value="CON" ${attack.saveType === 'CON' ? 'selected' : ''}>CON</option>
+                                    <option value="INT" ${attack.saveType === 'INT' ? 'selected' : ''}>INT</option>
+                                    <option value="WIS" ${attack.saveType === 'WIS' ? 'selected' : ''}>WIS</option>
+                                    <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Save DC</label>
-                            <input type="number"
-                                   value="${attack.saveDC}"
-                                   onchange="updateCharacterAttack(${attack.id}, 'saveDC', parseInt(this.value))">
+
+                        ${renderDamageComponents(attack, 'character', null)}
+
+                        <div class="advantage-selector" onclick="event.stopPropagation()">
+                            <label>
+                                <input type="radio" name="adv-${attack.id}" value="normal"
+                                       ${attack.advantage === 'normal' ? 'checked' : ''}
+                                       onchange="updateCharacterAttack(${attack.id}, 'advantage', 'normal')">
+                                Normal
+                            </label>
+                            <label>
+                                <input type="radio" name="adv-${attack.id}" value="advantage"
+                                       ${attack.advantage === 'advantage' ? 'checked' : ''}
+                                       onchange="updateCharacterAttack(${attack.id}, 'advantage', 'advantage')">
+                                Adv
+                            </label>
+                            <label>
+                                <input type="radio" name="adv-${attack.id}" value="disadvantage"
+                                       ${attack.advantage === 'disadvantage' ? 'checked' : ''}
+                                       onchange="updateCharacterAttack(${attack.id}, 'advantage', 'disadvantage')">
+                                Dis
+                            </label>
                         </div>
-                        <div class="form-group">
-                            <label>Save Type</label>
-                            <select onchange="updateCharacterAttack(${attack.id}, 'saveType', this.value)">
-                                <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
-                                <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
-                                <option value="CON" ${attack.saveType === 'CON' ? 'selected' : ''}>CON</option>
-                                <option value="INT" ${attack.saveType === 'INT' ? 'selected' : ''}>INT</option>
-                                <option value="WIS" ${attack.saveType === 'WIS' ? 'selected' : ''}>WIS</option>
-                                <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
-                            </select>
+
+                        <div class="attack-actions" onclick="event.stopPropagation()">
+                            <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'character')">🎲 Roll</button>
+                            <button class="btn-danger btn-small" onclick="removeCharacterAttack(${attack.id})">Remove</button>
                         </div>
-                    </div>
-
-                    ${renderDamageComponents(attack, 'character', null)}
-
-                    <div class="advantage-selector">
-                        <label>
-                            <input type="radio"
-                                   name="advantage-${attack.id}"
-                                   value="normal"
-                                   ${attack.advantage === 'normal' ? 'checked' : ''}
-                                   onchange="updateCharacterAttack(${attack.id}, 'advantage', 'normal')">
-                            Normal
-                        </label>
-                        <label>
-                            <input type="radio"
-                                   name="advantage-${attack.id}"
-                                   value="advantage"
-                                   ${attack.advantage === 'advantage' ? 'checked' : ''}
-                                   onchange="updateCharacterAttack(${attack.id}, 'advantage', 'advantage')">
-                            Advantage
-                        </label>
-                        <label>
-                            <input type="radio"
-                                   name="advantage-${attack.id}"
-                                   value="disadvantage"
-                                   ${attack.advantage === 'disadvantage' ? 'checked' : ''}
-                                   onchange="updateCharacterAttack(${attack.id}, 'advantage', 'disadvantage')">
-                            Disadvantage
-                        </label>
-                    </div>
-
-                    <div class="attack-actions">
-                        <button class="btn-success" onclick="rollSingleAttack(${attack.id}, 'character')">🎲 Roll This Attack</button>
-                        <button class="btn-danger" onclick="removeCharacterAttack(${attack.id})">🗑️ Remove</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         // ========================================
@@ -955,7 +1016,7 @@
                 const attack = {
                     id: attackIdCounter++,
                     minionIdentifier: `#${nextNumber}`,
-                    name: 'New Attack',
+                    name: 'Attack',
                     attackBonus: 0,
                     damageComponents: [{
                         id: damageComponentIdCounter++,
@@ -966,7 +1027,8 @@
                     saveDC: 0,
                     saveType: 'DEX',
                     advantage: 'normal',
-                    selected: false
+                    selected: false,
+                    expanded: true
                 };
                 minion.attacks.push(attack);
                 renderMinions();
@@ -991,6 +1053,8 @@
                     attack[field] = value;
                     if (field === 'selected') {
                         renderMinions();
+                    } else if (['name', 'minionIdentifier', 'attackBonus', 'damageComponents'].includes(field)) {
+                        renderMinions();
                     }
                     saveState();
                 }
@@ -1012,111 +1076,115 @@
         function renderMinions() {
             const container = document.getElementById('minions');
             if (minions.length === 0) {
-                container.innerHTML = '<p class="empty-state">No minion groups yet. Add one to get started!</p>';
+                container.innerHTML = '<p class="empty-state">No minion groups yet</p>';
                 return;
             }
 
             container.innerHTML = minions.map(minion => `
                 <div class="minion-item">
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <label>Minion Group Name</label>
-                        <input type="text"
-                               value="${minion.name}"
-                               placeholder="Minion Group Name"
-                               onchange="updateMinion(${minion.id}, 'name', this.value)">
-                    </div>
+                    <input type="text"
+                           value="${minion.name}"
+                           placeholder="Group Name"
+                           style="margin-bottom: 8px; font-weight: bold;"
+                           onchange="updateMinion(${minion.id}, 'name', this.value)">
 
-                    ${minion.attacks.map(attack => `
-                        <div class="attack-item ${attack.selected ? 'selected' : ''}" style="background: white;">
-                            <div class="attack-header">
+                    ${minion.attacks.map(attack => {
+                        const damageSummary = getDamageSummary(attack.damageComponents);
+                        return `
+                        <div class="attack-item ${attack.selected ? 'selected' : ''} ${attack.expanded ? 'expanded' : ''}" data-attack-id="${attack.id}" style="background: white;">
+                            <div class="attack-compact" onclick="toggleExpand(${attack.id}, 'minion')">
                                 <input type="checkbox"
                                        class="attack-checkbox"
                                        ${attack.selected ? 'checked' : ''}
-                                       onchange="toggleMinionAttackSelection(${minion.id}, ${attack.id})">
-                                <div style="display: flex; gap: 10px; flex: 1;">
+                                       onclick="event.stopPropagation(); toggleMinionAttackSelection(${minion.id}, ${attack.id})">
+                                <div class="attack-info">
+                                    <div class="attack-name">${attack.minionIdentifier} ${attack.name}</div>
+                                    <div class="attack-stats">
+                                        <span class="stat-badge stat-hit">+${attack.attackBonus}</span>
+                                        <span class="stat-badge stat-dmg">${damageSummary}</span>
+                                        ${attack.saveDC > 0 ? `<span class="stat-badge stat-save">DC${attack.saveDC} ${attack.saveType}</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="expand-icon">▼</div>
+                            </div>
+                            <div class="attack-details">
+                                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
                                     <input type="text"
                                            value="${attack.minionIdentifier || ''}"
                                            placeholder="#1"
-                                           style="width: 80px; font-weight: bold; text-align: center;"
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'minionIdentifier', this.value)">
+                                           style="width: 60px; font-weight: bold;"
+                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'minionIdentifier', this.value)"
+                                           onclick="event.stopPropagation()">
                                     <input type="text"
                                            value="${attack.name}"
-                                           placeholder="Attack Name"
-                                           style="flex: 1;"
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'name', this.value)">
+                                           placeholder="Attack"
+                                           style="flex: 1; font-weight: bold;"
+                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'name', this.value)"
+                                           onclick="event.stopPropagation()">
                                 </div>
-                            </div>
 
-                            <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; gap: 15px; align-items: center; font-weight: bold;">
-                                <span style="color: #1976d2;">⚔️ To Hit: +${attack.attackBonus}</span>
-                                ${attack.saveDC > 0 ? `<span style="color: #d32f2f;">🛡️ Save DC: ${attack.saveDC} ${attack.saveType}</span>` : ''}
-                            </div>
-
-                            <div class="attack-grid">
-                                <div class="form-group">
-                                    <label>Attack Bonus</label>
-                                    <input type="number"
-                                           value="${attack.attackBonus}"
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'attackBonus', parseInt(this.value))">
+                                <div class="attack-grid">
+                                    <div class="form-group">
+                                        <label>To Hit</label>
+                                        <input type="number"
+                                               value="${attack.attackBonus}"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'attackBonus', parseInt(this.value))"
+                                               onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Save DC</label>
+                                        <input type="number"
+                                               value="${attack.saveDC}"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveDC', parseInt(this.value))"
+                                               onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Save</label>
+                                        <select onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveType', this.value)" onclick="event.stopPropagation()">
+                                            <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
+                                            <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
+                                            <option value="CON" ${attack.saveType === 'CON' ? 'selected' : ''}>CON</option>
+                                            <option value="INT" ${attack.saveType === 'INT' ? 'selected' : ''}>INT</option>
+                                            <option value="WIS" ${attack.saveType === 'WIS' ? 'selected' : ''}>WIS</option>
+                                            <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label>Save DC</label>
-                                    <input type="number"
-                                           value="${attack.saveDC}"
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveDC', parseInt(this.value))">
+
+                                ${renderDamageComponents(attack, 'minion', minion.id)}
+
+                                <div class="advantage-selector" onclick="event.stopPropagation()">
+                                    <label>
+                                        <input type="radio" name="adv-${minion.id}-${attack.id}" value="normal"
+                                               ${attack.advantage === 'normal' ? 'checked' : ''}
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'normal')">
+                                        Normal
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="adv-${minion.id}-${attack.id}" value="advantage"
+                                               ${attack.advantage === 'advantage' ? 'checked' : ''}
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'advantage')">
+                                        Adv
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="adv-${minion.id}-${attack.id}" value="disadvantage"
+                                               ${attack.advantage === 'disadvantage' ? 'checked' : ''}
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'disadvantage')">
+                                        Dis
+                                    </label>
                                 </div>
-                                <div class="form-group">
-                                    <label>Save Type</label>
-                                    <select onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveType', this.value)">
-                                        <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
-                                        <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
-                                        <option value="CON" ${attack.saveType === 'CON' ? 'selected' : ''}>CON</option>
-                                        <option value="INT" ${attack.saveType === 'INT' ? 'selected' : ''}>INT</option>
-                                        <option value="WIS" ${attack.saveType === 'WIS' ? 'selected' : ''}>WIS</option>
-                                        <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
-                                    </select>
+
+                                <div class="attack-actions" onclick="event.stopPropagation()">
+                                    <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'minion', ${minion.id})">🎲 Roll</button>
+                                    <button class="btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})">Remove</button>
                                 </div>
-                            </div>
-
-                            ${renderDamageComponents(attack, 'minion', minion.id)}
-
-                            <div class="advantage-selector">
-                                <label>
-                                    <input type="radio"
-                                           name="advantage-${minion.id}-${attack.id}"
-                                           value="normal"
-                                           ${attack.advantage === 'normal' ? 'checked' : ''}
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'normal')">
-                                    Normal
-                                </label>
-                                <label>
-                                    <input type="radio"
-                                           name="advantage-${minion.id}-${attack.id}"
-                                           value="advantage"
-                                           ${attack.advantage === 'advantage' ? 'checked' : ''}
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'advantage')">
-                                    Advantage
-                                </label>
-                                <label>
-                                    <input type="radio"
-                                           name="advantage-${minion.id}-${attack.id}"
-                                           value="disadvantage"
-                                           ${attack.advantage === 'disadvantage' ? 'checked' : ''}
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'disadvantage')">
-                                    Disadvantage
-                                </label>
-                            </div>
-
-                            <div class="attack-actions">
-                                <button class="btn-success" onclick="rollSingleAttack(${attack.id}, 'minion', ${minion.id})">🎲 Roll This Attack</button>
-                                <button class="btn-danger" onclick="removeMinionAttack(${minion.id}, ${attack.id})">🗑️ Remove</button>
                             </div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
 
-                    <div style="margin-top: 15px; display: flex; gap: 10px;">
-                        <button class="btn-primary" onclick="addMinionAttack(${minion.id})">➕ Add Attack</button>
-                        <button class="btn-danger" onclick="removeMinion(${minion.id})">🗑️ Remove Minion Group</button>
+                    <div style="margin-top: 8px; display: flex; gap: 6px;">
+                        <button class="btn-primary btn-small" style="flex: 1;" onclick="addMinionAttack(${minion.id})">+ Attack</button>
+                        <button class="btn-danger btn-small" onclick="removeMinion(${minion.id})">Remove Group</button>
                     </div>
                 </div>
             `).join('');
@@ -1177,18 +1245,16 @@
             }
 
             if (selectedAttacks.length === 0) {
-                alert('No attacks selected! Check the boxes next to attacks you want to roll.');
+                alert('No attacks selected!');
                 return;
             }
 
-            // Save this configuration for "Repeat Last Roll"
             lastRollConfig = { type, selectedAttacks: selectedAttacks.map(sa => ({
                 attackId: sa.attack.id,
                 attackerName: sa.attackerName,
                 attackType: type === 'character' ? 'character' : 'minion'
             }))};
 
-            // Roll all selected attacks
             selectedAttacks.forEach(({ attack, attackerName }) => {
                 const result = executeAttackRoll(attack, attackerName);
                 addResult(result);
@@ -1199,8 +1265,8 @@
 
         function executeAttackRoll(attack, attackerName) {
             let attackRoll;
-            const advantageText = attack.advantage === 'advantage' ? ' (Advantage)' :
-                                 attack.advantage === 'disadvantage' ? ' (Disadvantage)' : '';
+            const advantageText = attack.advantage === 'advantage' ? ' (Adv)' :
+                                 attack.advantage === 'disadvantage' ? ' (Dis)' : '';
 
             if (attack.advantage === 'advantage') {
                 attackRoll = rollWithAdvantage(attack.attackBonus);
@@ -1210,6 +1276,7 @@
                 attackRoll = rollNormal(attack.attackBonus);
             }
 
+            const damageRoll = rollDice(attack.damage || '');
             const isCrit = attackRoll.natural === 20;
             const isFumble = attackRoll.natural === 1;
 
@@ -1218,7 +1285,6 @@
                 const diceRoll = rollDice(comp.dice);
                 let total = diceRoll.total + comp.bonus;
 
-                // Double on crit
                 if (isCrit) {
                     total = total * 2;
                 }
@@ -1254,7 +1320,7 @@
 
         function repeatLastRoll() {
             if (!lastRollConfig) {
-                alert('No previous roll to repeat!');
+                alert('No previous roll!');
                 return;
             }
 
@@ -1266,7 +1332,6 @@
                 if (attackType === 'character') {
                     attack = characterAttacks.find(a => a.id === attackId);
                 } else {
-                    // Find attack in minions
                     for (const minion of minions) {
                         const found = minion.attacks.find(a => a.id === attackId);
                         if (found) {
@@ -1303,10 +1368,10 @@
             } = resultData;
 
             const resultClass = isCrit ? 'critical-success' : isFumble ? 'critical-failure' : '';
-            const critText = isCrit ? ' 🎯 <strong>CRITICAL HIT!</strong>' : isFumble ? ' 💥 <strong>CRITICAL MISS!</strong>' : '';
+            const critText = isCrit ? ' 🎯 CRIT!' : isFumble ? ' 💥 MISS!' : '';
 
             const attackRollDisplay = attackRoll.rolls.length > 1
-                ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(', ')}] → <span class="dice-result">${attackRoll.selected}</span>`
+                ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
                 : `<span class="dice-result">${attackRoll.rolls[0]}</span>`;
 
             const damageBreakdown = damageResults.map(dr => {
@@ -1318,10 +1383,10 @@
                 return `
                     <div class="damage-type-result">
                         <span>
-                            <span class="damage-type-badge dtype-${dr.damageType}">${dr.damageType.toUpperCase()}</span>
+                            <span class="damage-type-badge dtype-${dr.damageType}">${dr.damageType.substring(0,3).toUpperCase()}</span>
                             ${rollsDisplay}${bonusDisplay}
                         </span>
-                        <span style="font-weight: bold; font-size: 16px;">${dr.total}</span>
+                        <span style="font-weight: bold;">${dr.total}</span>
                     </div>
                 `;
             }).join('');
@@ -1333,16 +1398,15 @@
                         <span class="result-timestamp">${timestamp}</span>
                     </div>
                     <div class="result-detail">
-                        <strong>Attack Roll:</strong> ${attackRollDisplay} + ${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
+                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
                     </div>
                     <div class="damage-breakdown">
-                        <strong>💥 Damage Breakdown:</strong>
                         ${damageBreakdown}
                         <div class="damage-total">
-                            <strong>TOTAL DAMAGE: ${totalDamage}</strong>${isCrit ? ' (Doubled for crit!)' : ''}
+                            TOTAL: ${totalDamage}${isCrit ? ' (x2)' : ''}
                         </div>
                     </div>
-                    ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC ${saveDC} ${saveType}</div>` : ''}
+                    ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC${saveDC} ${saveType}</div>` : ''}
                 </div>
             `;
 
@@ -1354,14 +1418,13 @@
 
             resultsContainer.insertAdjacentHTML('afterbegin', html);
 
-            // Add to combat log history
             combatLog.unshift(resultData);
             saveState();
         }
 
         function clearResults() {
             const resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = '<div class="empty-state">No rolls yet. Select attacks and click "Roll Selected"!</div>';
+            resultsContainer.innerHTML = '<div class="empty-state">No rolls yet</div>';
             combatLog = [];
             saveState();
         }
@@ -1376,21 +1439,18 @@
 
             combatLog.slice().reverse().forEach((entry, index) => {
                 text += `[${entry.timestamp}] ${entry.attackerName} - ${entry.attackName}${entry.advantageText}\n`;
-                text += `  Attack: ${entry.attackRoll.total}`;
-                if (entry.isCrit) text += ' CRITICAL HIT!';
-                if (entry.isFumble) text += ' CRITICAL MISS!';
-                text += '\n';
-
-                text += '  Damage:\n';
+                text += `  Hit: ${entry.attackRoll.total}`;
+                if (entry.isCrit) text += ' CRITICAL!';
+                if (entry.isFumble) text += ' MISS!';
+                text += '\n  Damage:\n';
                 entry.damageResults.forEach(dr => {
-                    text += `    ${dr.damageType.toUpperCase()}: ${dr.total}\n`;
+                    text += `    ${dr.damageType}: ${dr.total}\n`;
                 });
                 text += `  TOTAL: ${entry.totalDamage}`;
                 if (entry.isCrit) text += ' (doubled)';
                 text += '\n';
-
                 if (entry.saveDC > 0) {
-                    text += `  Save: DC ${entry.saveDC} ${entry.saveType}\n`;
+                    text += `  Save: DC${entry.saveDC} ${entry.saveType}\n`;
                 }
                 text += '\n';
             });
@@ -1416,11 +1476,11 @@
             const html = `
                 <div class="result-item">
                     <div class="result-header">
-                        <span>Quick Roll - ${diceType}</span>
+                        <span>Quick ${diceType}</span>
                         <span class="result-timestamp">${timestamp}</span>
                     </div>
                     <div class="result-detail">
-                        <strong>Result:</strong> <span class="dice-result">${roll}</span>
+                        <span class="dice-result">${roll}</span>
                     </div>
                 </div>
             `;
@@ -1466,12 +1526,10 @@
                     minionIdCounter = state.minionIdCounter || 0;
                     damageComponentIdCounter = state.damageComponentIdCounter || 0;
 
-                    // Restore UI
                     document.getElementById('characterName').value = characterName;
                     renderCharacterAttacks();
                     renderMinions();
 
-                    // Restore combat log
                     if (combatLog.length > 0) {
                         const resultsContainer = document.getElementById('results');
                         resultsContainer.innerHTML = '';
@@ -1499,10 +1557,10 @@
             } = resultData;
 
             const resultClass = isCrit ? 'critical-success' : isFumble ? 'critical-failure' : '';
-            const critText = isCrit ? ' 🎯 <strong>CRITICAL HIT!</strong>' : isFumble ? ' 💥 <strong>CRITICAL MISS!</strong>' : '';
+            const critText = isCrit ? ' 🎯 CRIT!' : isFumble ? ' 💥 MISS!' : '';
 
             const attackRollDisplay = attackRoll.rolls.length > 1
-                ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(', ')}] → <span class="dice-result">${attackRoll.selected}</span>`
+                ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
                 : `<span class="dice-result">${attackRoll.rolls[0]}</span>`;
 
             const damageBreakdown = damageResults.map(dr => {
@@ -1514,10 +1572,10 @@
                 return `
                     <div class="damage-type-result">
                         <span>
-                            <span class="damage-type-badge dtype-${dr.damageType}">${dr.damageType.toUpperCase()}</span>
+                            <span class="damage-type-badge dtype-${dr.damageType}">${dr.damageType.substring(0,3).toUpperCase()}</span>
                             ${rollsDisplay}${bonusDisplay}
                         </span>
-                        <span style="font-weight: bold; font-size: 16px;">${dr.total}</span>
+                        <span style="font-weight: bold;">${dr.total}</span>
                     </div>
                 `;
             }).join('');
@@ -1529,16 +1587,15 @@
                         <span class="result-timestamp">${timestamp}</span>
                     </div>
                     <div class="result-detail">
-                        <strong>Attack Roll:</strong> ${attackRollDisplay} + ${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
+                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
                     </div>
                     <div class="damage-breakdown">
-                        <strong>💥 Damage Breakdown:</strong>
                         ${damageBreakdown}
                         <div class="damage-total">
-                            <strong>TOTAL DAMAGE: ${totalDamage}</strong>${isCrit ? ' (Doubled for crit!)' : ''}
+                            TOTAL: ${totalDamage}${isCrit ? ' (x2)' : ''}
                         </div>
                     </div>
-                    ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC ${saveDC} ${saveType}</div>` : ''}
+                    ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC${saveDC} ${saveType}</div>` : ''}
                 </div>
             `;
 
@@ -1555,11 +1612,9 @@
         // INITIALIZATION
         // ========================================
 
-        // Load saved state on page load
         window.addEventListener('DOMContentLoaded', () => {
             loadState();
 
-            // If no saved data, show initial empty state
             if (characterAttacks.length === 0) {
                 renderCharacterAttacks();
             }
@@ -1568,7 +1623,6 @@
             }
         });
 
-        // Save state before page unload
         window.addEventListener('beforeunload', saveState);
     </script>
 </body>
