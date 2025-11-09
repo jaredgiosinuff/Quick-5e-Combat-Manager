@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
@@ -198,6 +198,11 @@
             background: #5a6268;
         }
 
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
         .btn-large {
             padding: 15px 30px;
             font-size: 18px;
@@ -287,10 +292,63 @@
             cursor: pointer;
         }
 
+        .damage-components {
+            background: #fff;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .damage-components h4 {
+            color: #495057;
+            margin-bottom: 12px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .damage-component {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            align-items: end;
+        }
+
+        .damage-type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin: 2px;
+            color: white;
+        }
+
+        .dtype-slashing { background: #6c757d; }
+        .dtype-piercing { background: #495057; }
+        .dtype-bludgeoning { background: #343a40; }
+        .dtype-poison { background: #6f42c1; }
+        .dtype-acid { background: #20c997; }
+        .dtype-fire { background: #fd7e14; }
+        .dtype-cold { background: #0dcaf0; }
+        .dtype-radiant { background: #ffc107; }
+        .dtype-necrotic { background: #6610f2; }
+        .dtype-lightning { background: #0d6efd; }
+        .dtype-thunder { background: #6c757d; }
+        .dtype-force { background: #d63384; }
+        .dtype-psychic { background: #e83e8c; }
+
         .attack-actions {
             display: flex;
             gap: 10px;
             margin-top: 10px;
+            flex-wrap: wrap;
         }
 
         .result-item {
@@ -331,6 +389,32 @@
         .result-detail {
             margin: 5px 0;
             font-size: 14px;
+        }
+
+        .damage-breakdown {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        .damage-type-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 6px 0;
+            padding: 6px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .damage-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #dc3545;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #dee2e6;
         }
 
         .dice-result {
@@ -397,6 +481,10 @@
 
             .batch-controls button {
                 width: 100%;
+            }
+
+            .damage-component {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -473,6 +561,26 @@
 
     <script>
         // ========================================
+        // CONSTANTS
+        // ========================================
+
+        const DAMAGE_TYPES = [
+            'slashing',
+            'piercing',
+            'bludgeoning',
+            'poison',
+            'acid',
+            'fire',
+            'cold',
+            'radiant',
+            'necrotic',
+            'lightning',
+            'thunder',
+            'force',
+            'psychic'
+        ];
+
+        // ========================================
         // STATE MANAGEMENT
         // ========================================
 
@@ -483,6 +591,7 @@
         let lastRollConfig = null;
         let attackIdCounter = 0;
         let minionIdCounter = 0;
+        let damageComponentIdCounter = 0;
 
         // ========================================
         // DICE ROLLING FUNCTIONS
@@ -545,6 +654,118 @@
         }
 
         // ========================================
+        // DAMAGE COMPONENT FUNCTIONS
+        // ========================================
+
+        function addDamageComponent(attackId, type = 'character', minionId = null) {
+            const component = {
+                id: damageComponentIdCounter++,
+                dice: '1d8',
+                bonus: 0,
+                damageType: 'slashing'
+            };
+
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.damageComponents.push(component);
+                    renderCharacterAttacks();
+                }
+            } else {
+                const minion = minions.find(m => m.id === minionId);
+                if (minion) {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        attack.damageComponents.push(component);
+                        renderMinions();
+                    }
+                }
+            }
+            saveState();
+        }
+
+        function removeDamageComponent(attackId, componentId, type = 'character', minionId = null) {
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.damageComponents = attack.damageComponents.filter(c => c.id !== componentId);
+                    renderCharacterAttacks();
+                }
+            } else {
+                const minion = minions.find(m => m.id === minionId);
+                if (minion) {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        attack.damageComponents = attack.damageComponents.filter(c => c.id !== componentId);
+                        renderMinions();
+                    }
+                }
+            }
+            saveState();
+        }
+
+        function updateDamageComponent(attackId, componentId, field, value, type = 'character', minionId = null) {
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    const component = attack.damageComponents.find(c => c.id === componentId);
+                    if (component) {
+                        component[field] = value;
+                        saveState();
+                    }
+                }
+            } else {
+                const minion = minions.find(m => m.id === minionId);
+                if (minion) {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        const component = attack.damageComponents.find(c => c.id === componentId);
+                        if (component) {
+                            component[field] = value;
+                            saveState();
+                        }
+                    }
+                }
+            }
+        }
+
+        function renderDamageComponents(attack, attackType = 'character', minionId = null) {
+            return `
+                <div class="damage-components">
+                    <h4>
+                        <span>💥 Damage Components</span>
+                        <button class="btn-primary btn-small" onclick="addDamageComponent(${attack.id}, '${attackType}', ${minionId})">➕ Add Damage</button>
+                    </h4>
+                    ${attack.damageComponents.map(comp => `
+                        <div class="damage-component">
+                            <div class="form-group">
+                                <label>Dice</label>
+                                <input type="text"
+                                       value="${comp.dice}"
+                                       placeholder="e.g., 2d6"
+                                       onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'dice', this.value, '${attackType}', ${minionId})">
+                            </div>
+                            <div class="form-group">
+                                <label>Bonus</label>
+                                <input type="number"
+                                       value="${comp.bonus}"
+                                       onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'bonus', parseInt(this.value), '${attackType}', ${minionId})">
+                            </div>
+                            <div class="form-group">
+                                <label>Damage Type</label>
+                                <select onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'damageType', this.value, '${attackType}', ${minionId})">
+                                    ${DAMAGE_TYPES.map(dt => `<option value="${dt}" ${comp.damageType === dt ? 'selected' : ''}>${dt.charAt(0).toUpperCase() + dt.slice(1)}</option>`).join('')}
+                                </select>
+                            </div>
+                            <button class="btn-danger btn-small" onclick="removeDamageComponent(${attack.id}, ${comp.id}, '${attackType}', ${minionId})">🗑️</button>
+                        </div>
+                    `).join('')}
+                    ${attack.damageComponents.length === 0 ? '<p class="empty-state" style="padding: 15px; margin: 0;">No damage components. Add one to get started!</p>' : ''}
+                </div>
+            `;
+        }
+
+        // ========================================
         // CHARACTER ATTACK FUNCTIONS
         // ========================================
 
@@ -553,7 +774,12 @@
                 id: attackIdCounter++,
                 name: 'New Attack',
                 attackBonus: 0,
-                damage: '1d8',
+                damageComponents: [{
+                    id: damageComponentIdCounter++,
+                    dice: '1d8',
+                    bonus: 0,
+                    damageType: 'slashing'
+                }],
                 saveDC: 0,
                 saveType: 'DEX',
                 advantage: 'normal',
@@ -575,7 +801,7 @@
             if (attack) {
                 attack[field] = value;
                 if (field === 'selected') {
-                    renderCharacterAttacks(); // Re-render to show selection highlight
+                    renderCharacterAttacks();
                 }
                 saveState();
             }
@@ -625,19 +851,17 @@
                         </div>
                     </div>
 
+                    <div style="background: #e8f5e9; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; gap: 15px; align-items: center; font-weight: bold;">
+                        <span style="color: #2e7d32;">⚔️ To Hit: +${attack.attackBonus}</span>
+                        ${attack.saveDC > 0 ? `<span style="color: #c62828;">🛡️ Save DC: ${attack.saveDC} ${attack.saveType}</span>` : ''}
+                    </div>
+
                     <div class="attack-grid">
                         <div class="form-group">
                             <label>Attack Bonus</label>
                             <input type="number"
                                    value="${attack.attackBonus}"
                                    onchange="updateCharacterAttack(${attack.id}, 'attackBonus', parseInt(this.value))">
-                        </div>
-                        <div class="form-group">
-                            <label>Damage</label>
-                            <input type="text"
-                                   value="${attack.damage}"
-                                   placeholder="e.g., 2d6+3"
-                                   onchange="updateCharacterAttack(${attack.id}, 'damage', this.value)">
                         </div>
                         <div class="form-group">
                             <label>Save DC</label>
@@ -657,6 +881,8 @@
                             </select>
                         </div>
                     </div>
+
+                    ${renderDamageComponents(attack, 'character', null)}
 
                     <div class="advantage-selector">
                         <label>
@@ -725,11 +951,18 @@
         function addMinionAttack(minionId) {
             const minion = minions.find(m => m.id === minionId);
             if (minion) {
+                const nextNumber = minion.attacks.length + 1;
                 const attack = {
                     id: attackIdCounter++,
+                    minionIdentifier: `#${nextNumber}`,
                     name: 'New Attack',
                     attackBonus: 0,
-                    damage: '1d8',
+                    damageComponents: [{
+                        id: damageComponentIdCounter++,
+                        dice: '1d8',
+                        bonus: 0,
+                        damageType: 'slashing'
+                    }],
                     saveDC: 0,
                     saveType: 'DEX',
                     advantage: 'normal',
@@ -800,12 +1033,23 @@
                                        class="attack-checkbox"
                                        ${attack.selected ? 'checked' : ''}
                                        onchange="toggleMinionAttackSelection(${minion.id}, ${attack.id})">
-                                <div class="attack-name-wrapper">
+                                <div style="display: flex; gap: 10px; flex: 1;">
+                                    <input type="text"
+                                           value="${attack.minionIdentifier || ''}"
+                                           placeholder="#1"
+                                           style="width: 80px; font-weight: bold; text-align: center;"
+                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'minionIdentifier', this.value)">
                                     <input type="text"
                                            value="${attack.name}"
                                            placeholder="Attack Name"
+                                           style="flex: 1;"
                                            onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'name', this.value)">
                                 </div>
+                            </div>
+
+                            <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; gap: 15px; align-items: center; font-weight: bold;">
+                                <span style="color: #1976d2;">⚔️ To Hit: +${attack.attackBonus}</span>
+                                ${attack.saveDC > 0 ? `<span style="color: #d32f2f;">🛡️ Save DC: ${attack.saveDC} ${attack.saveType}</span>` : ''}
                             </div>
 
                             <div class="attack-grid">
@@ -814,13 +1058,6 @@
                                     <input type="number"
                                            value="${attack.attackBonus}"
                                            onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'attackBonus', parseInt(this.value))">
-                                </div>
-                                <div class="form-group">
-                                    <label>Damage</label>
-                                    <input type="text"
-                                           value="${attack.damage}"
-                                           placeholder="e.g., 2d6+3"
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'damage', this.value)">
                                 </div>
                                 <div class="form-group">
                                     <label>Save DC</label>
@@ -840,6 +1077,8 @@
                                     </select>
                                 </div>
                             </div>
+
+                            ${renderDamageComponents(attack, 'minion', minion.id)}
 
                             <div class="advantage-selector">
                                 <label>
@@ -896,7 +1135,11 @@
             } else {
                 const minion = minions.find(m => m.id === minionId);
                 attack = minion ? minion.attacks.find(a => a.id === attackId) : null;
-                attackerName = minion ? minion.name : 'Minion';
+                if (attack && attack.minionIdentifier) {
+                    attackerName = minion ? `${minion.name} ${attack.minionIdentifier}` : 'Minion';
+                } else {
+                    attackerName = minion ? minion.name : 'Minion';
+                }
             }
 
             if (!attack) return;
@@ -921,9 +1164,12 @@
                 minions.forEach(minion => {
                     minion.attacks.forEach(attack => {
                         if (attack.selected) {
+                            const attackerName = attack.minionIdentifier
+                                ? `${minion.name} ${attack.minionIdentifier}`
+                                : minion.name;
                             selectedAttacks.push({
                                 attack,
-                                attackerName: minion.name
+                                attackerName: attackerName
                             });
                         }
                     });
@@ -964,14 +1210,30 @@
                 attackRoll = rollNormal(attack.attackBonus);
             }
 
-            const damageRoll = rollDice(attack.damage);
             const isCrit = attackRoll.natural === 20;
             const isFumble = attackRoll.natural === 1;
 
-            let finalDamage = damageRoll.total;
-            if (isCrit) {
-                finalDamage = damageRoll.total * 2;
-            }
+            // Roll damage for each component
+            const damageResults = attack.damageComponents.map(comp => {
+                const diceRoll = rollDice(comp.dice);
+                let total = diceRoll.total + comp.bonus;
+
+                // Double on crit
+                if (isCrit) {
+                    total = total * 2;
+                }
+
+                return {
+                    damageType: comp.damageType,
+                    dice: comp.dice,
+                    bonus: comp.bonus,
+                    rolls: diceRoll.rolls,
+                    total: total,
+                    isCrit: isCrit
+                };
+            });
+
+            const totalDamage = damageResults.reduce((sum, dr) => sum + dr.total, 0);
 
             const timestamp = new Date().toLocaleTimeString();
 
@@ -981,8 +1243,8 @@
                 attackName: attack.name,
                 advantageText,
                 attackRoll,
-                damageRoll,
-                finalDamage,
+                damageResults,
+                totalDamage,
                 isCrit,
                 isFumble,
                 saveDC: attack.saveDC,
@@ -1032,8 +1294,8 @@
                 attackName,
                 advantageText,
                 attackRoll,
-                damageRoll,
-                finalDamage,
+                damageResults,
+                totalDamage,
                 isCrit,
                 isFumble,
                 saveDC,
@@ -1047,9 +1309,22 @@
                 ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(', ')}] → <span class="dice-result">${attackRoll.selected}</span>`
                 : `<span class="dice-result">${attackRoll.rolls[0]}</span>`;
 
-            const damageRollDisplay = damageRoll.rolls.length > 0
-                ? `[${damageRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(', ')}]${damageRoll.modifier ? ' + ' + damageRoll.modifier : ''}`
-                : '';
+            const damageBreakdown = damageResults.map(dr => {
+                const rollsDisplay = dr.rolls.length > 0
+                    ? `[${dr.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}]`
+                    : '';
+                const bonusDisplay = dr.bonus !== 0 ? ` ${dr.bonus > 0 ? '+' : ''}${dr.bonus}` : '';
+
+                return `
+                    <div class="damage-type-result">
+                        <span>
+                            <span class="damage-type-badge dtype-${dr.damageType}">${dr.damageType.toUpperCase()}</span>
+                            ${rollsDisplay}${bonusDisplay}
+                        </span>
+                        <span style="font-weight: bold; font-size: 16px;">${dr.total}</span>
+                    </div>
+                `;
+            }).join('');
 
             const html = `
                 <div class="result-item ${resultClass}">
@@ -1060,8 +1335,12 @@
                     <div class="result-detail">
                         <strong>Attack Roll:</strong> ${attackRollDisplay} + ${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
                     </div>
-                    <div class="result-detail">
-                        <strong>Damage:</strong> ${damageRollDisplay} = <strong>${finalDamage}</strong>${isCrit ? ' (Doubled for crit!)' : ''}
+                    <div class="damage-breakdown">
+                        <strong>💥 Damage Breakdown:</strong>
+                        ${damageBreakdown}
+                        <div class="damage-total">
+                            <strong>TOTAL DAMAGE: ${totalDamage}</strong>${isCrit ? ' (Doubled for crit!)' : ''}
+                        </div>
                     </div>
                     ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC ${saveDC} ${saveType}</div>` : ''}
                 </div>
@@ -1095,20 +1374,26 @@
 
             let text = '=== COMBAT LOG ===\n\n';
 
-            combatLog.reverse().forEach((entry, index) => {
+            combatLog.slice().reverse().forEach((entry, index) => {
                 text += `[${entry.timestamp}] ${entry.attackerName} - ${entry.attackName}${entry.advantageText}\n`;
                 text += `  Attack: ${entry.attackRoll.total}`;
                 if (entry.isCrit) text += ' CRITICAL HIT!';
                 if (entry.isFumble) text += ' CRITICAL MISS!';
-                text += `\n  Damage: ${entry.finalDamage}`;
-                if (entry.isCrit) text += ' (doubled)';
-                if (entry.saveDC > 0) {
-                    text += `\n  Save: DC ${entry.saveDC} ${entry.saveType}`;
-                }
-                text += '\n\n';
-            });
+                text += '\n';
 
-            combatLog.reverse(); // Restore original order
+                text += '  Damage:\n';
+                entry.damageResults.forEach(dr => {
+                    text += `    ${dr.damageType.toUpperCase()}: ${dr.total}\n`;
+                });
+                text += `  TOTAL: ${entry.totalDamage}`;
+                if (entry.isCrit) text += ' (doubled)';
+                text += '\n';
+
+                if (entry.saveDC > 0) {
+                    text += `  Save: DC ${entry.saveDC} ${entry.saveType}\n`;
+                }
+                text += '\n';
+            });
 
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
@@ -1161,7 +1446,8 @@
                 combatLog,
                 lastRollConfig,
                 attackIdCounter,
-                minionIdCounter
+                minionIdCounter,
+                damageComponentIdCounter
             };
             localStorage.setItem('combatManagerState', JSON.stringify(state));
         }
@@ -1178,6 +1464,7 @@
                     lastRollConfig = state.lastRollConfig || null;
                     attackIdCounter = state.attackIdCounter || 0;
                     minionIdCounter = state.minionIdCounter || 0;
+                    damageComponentIdCounter = state.damageComponentIdCounter || 0;
 
                     // Restore UI
                     document.getElementById('characterName').value = characterName;
@@ -1203,8 +1490,8 @@
                 attackName,
                 advantageText,
                 attackRoll,
-                damageRoll,
-                finalDamage,
+                damageResults,
+                totalDamage,
                 isCrit,
                 isFumble,
                 saveDC,
@@ -1218,9 +1505,22 @@
                 ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(', ')}] → <span class="dice-result">${attackRoll.selected}</span>`
                 : `<span class="dice-result">${attackRoll.rolls[0]}</span>`;
 
-            const damageRollDisplay = damageRoll.rolls.length > 0
-                ? `[${damageRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(', ')}]${damageRoll.modifier ? ' + ' + damageRoll.modifier : ''}`
-                : '';
+            const damageBreakdown = damageResults.map(dr => {
+                const rollsDisplay = dr.rolls.length > 0
+                    ? `[${dr.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}]`
+                    : '';
+                const bonusDisplay = dr.bonus !== 0 ? ` ${dr.bonus > 0 ? '+' : ''}${dr.bonus}` : '';
+
+                return `
+                    <div class="damage-type-result">
+                        <span>
+                            <span class="damage-type-badge dtype-${dr.damageType}">${dr.damageType.toUpperCase()}</span>
+                            ${rollsDisplay}${bonusDisplay}
+                        </span>
+                        <span style="font-weight: bold; font-size: 16px;">${dr.total}</span>
+                    </div>
+                `;
+            }).join('');
 
             const html = `
                 <div class="result-item ${resultClass}">
@@ -1231,8 +1531,12 @@
                     <div class="result-detail">
                         <strong>Attack Roll:</strong> ${attackRollDisplay} + ${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
                     </div>
-                    <div class="result-detail">
-                        <strong>Damage:</strong> ${damageRollDisplay} = <strong>${finalDamage}</strong>${isCrit ? ' (Doubled for crit!)' : ''}
+                    <div class="damage-breakdown">
+                        <strong>💥 Damage Breakdown:</strong>
+                        ${damageBreakdown}
+                        <div class="damage-total">
+                            <strong>TOTAL DAMAGE: ${totalDamage}</strong>${isCrit ? ' (Doubled for crit!)' : ''}
+                        </div>
                     </div>
                     ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC ${saveDC} ${saveType}</div>` : ''}
                 </div>
