@@ -16,9 +16,10 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
-            padding: 10px;
+            padding: 6px;
             color: #333;
-            font-size: 14px;
+            font-size: 11px;
+            line-height: 1.3;
         }
 
         .container {
@@ -29,23 +30,23 @@
         h1 {
             color: white;
             text-align: center;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            font-size: 1.5em;
+            margin-bottom: 6px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            font-size: 1.2em;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
         }
 
         .settings-toggle {
             background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.4);
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 4px 10px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 10px;
             transition: all 0.2s;
             user-select: none;
         }
@@ -58,8 +59,8 @@
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 4px;
+            margin-bottom: 4px;
         }
 
         .initiative-tracker {
@@ -114,17 +115,17 @@
 
         .card {
             background: white;
-            border-radius: 8px;
-            padding: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            padding: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
 
         .card h2 {
             color: #2a5298;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-            border-bottom: 2px solid #2a5298;
-            padding-bottom: 5px;
+            margin-bottom: 4px;
+            font-size: 0.95em;
+            border-bottom: 1px solid #2a5298;
+            padding-bottom: 2px;
         }
 
         .combat-log-card {
@@ -175,12 +176,13 @@
         input[type="text"],
         input[type="number"],
         select {
-            padding: 6px 8px;
+            padding: 3px 5px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 13px;
+            border-radius: 2px;
+            font-size: 11px;
             width: 100%;
             transition: border-color 0.2s;
+            line-height: 1.2;
         }
 
         input[type="text"]:focus,
@@ -203,14 +205,15 @@
         }
 
         button {
-            padding: 8px 12px;
+            padding: 4px 8px;
             border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
             touch-action: manipulation;
+            line-height: 1.2;
         }
 
         .btn-primary {
@@ -258,8 +261,8 @@
         }
 
         .btn-small {
-            padding: 4px 8px;
-            font-size: 11px;
+            padding: 2px 5px;
+            font-size: 9px;
         }
 
         .btn-large {
@@ -279,35 +282,35 @@
         /* COMPACT ATTACK CARDS */
         .attack-item {
             background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            transition: all 0.2s;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            transition: all 0.15s;
         }
 
         .attack-item.selected {
             background: #e3f2fd;
             border-color: #2a5298;
-            border-width: 3px;
-            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.2), 0 4px 8px rgba(42, 82, 152, 0.15);
+            border-width: 2px;
+            box-shadow: 0 0 0 1px rgba(42, 82, 152, 0.15);
         }
 
         .attack-compact {
             display: flex;
             align-items: center;
-            padding: 8px;
-            gap: 8px;
+            padding: 3px 4px;
+            gap: 4px;
             cursor: pointer;
             user-select: none;
         }
 
         .attack-compact:active {
-            background: rgba(0,0,0,0.03);
+            background: rgba(0,0,0,0.02);
         }
 
         .attack-checkbox {
-            width: 32px;
-            height: 32px;
+            width: 16px;
+            height: 16px;
             cursor: pointer;
             flex-shrink: 0;
         }
@@ -315,31 +318,31 @@
         .attack-info {
             flex: 1;
             min-width: 0;
-            font-size: 13px;
+            font-size: 10px;
         }
 
         .attack-name {
-            font-weight: bold;
+            font-weight: 600;
             color: #2a5298;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         .attack-stats {
-            font-size: 11px;
+            font-size: 9px;
             color: #666;
             display: flex;
-            gap: 10px;
+            gap: 4px;
             flex-wrap: wrap;
         }
 
         .stat-badge {
             background: #e0e0e0;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: bold;
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-weight: 600;
         }
 
         .stat-hit { background: #c8e6c9; color: #2e7d32; }
@@ -348,18 +351,18 @@
 
         .expand-icon {
             flex-shrink: 0;
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 12px;
             color: #999;
         }
 
         .attack-details {
             display: none;
-            padding: 8px;
+            padding: 4px;
             border-top: 1px solid #e0e0e0;
             background: white;
         }
@@ -374,9 +377,9 @@
 
         .attack-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 6px;
-            margin-bottom: 8px;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 3px;
+            margin-bottom: 4px;
         }
 
         .form-group {
@@ -385,44 +388,44 @@
         }
 
         .form-group label {
-            font-size: 10px;
-            font-weight: bold;
+            font-size: 8px;
+            font-weight: 600;
             color: #666;
-            margin-bottom: 3px;
+            margin-bottom: 1px;
             text-transform: uppercase;
         }
 
         .advantage-selector {
             display: flex;
-            gap: 8px;
-            margin: 6px 0;
-            font-size: 12px;
+            gap: 6px;
+            margin: 3px 0;
+            font-size: 10px;
         }
 
         .advantage-selector label {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             cursor: pointer;
         }
 
         .advantage-selector input[type="radio"] {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
         }
 
         .damage-components {
             background: #fff;
             border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 8px;
-            margin: 8px 0;
+            border-radius: 2px;
+            padding: 4px;
+            margin: 4px 0;
         }
 
         .damage-components h4 {
             color: #495057;
-            margin-bottom: 6px;
-            font-size: 11px;
+            margin-bottom: 3px;
+            font-size: 9px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -432,11 +435,11 @@
         .damage-component {
             display: grid;
             grid-template-columns: 2fr 1fr 2fr auto;
-            gap: 6px;
-            margin-bottom: 6px;
-            padding: 6px;
+            gap: 3px;
+            margin-bottom: 3px;
+            padding: 3px;
             background: #f8f9fa;
-            border-radius: 4px;
+            border-radius: 2px;
             align-items: end;
         }
 
@@ -466,17 +469,17 @@
 
         .attack-actions {
             display: flex;
-            gap: 6px;
-            margin-top: 8px;
+            gap: 3px;
+            margin-top: 4px;
             flex-wrap: wrap;
         }
 
         .minion-item {
             background: #fff3e0;
-            border: 2px solid #ffb74d;
-            border-radius: 6px;
-            padding: 8px;
-            margin-bottom: 8px;
+            border: 1px solid #ffb74d;
+            border-radius: 3px;
+            padding: 4px;
+            margin-bottom: 4px;
         }
 
         .result-item {
@@ -794,6 +797,77 @@
                 display: flex;
             }
         }
+
+        /* Autocomplete Styles */
+        .autocomplete-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .autocomplete-input {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+        }
+
+        .autocomplete-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            color: #999;
+            pointer-events: none;
+            padding: 8px;
+            border: 1px solid transparent;
+            font-family: inherit;
+            font-size: inherit;
+            white-space: pre;
+            overflow: hidden;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #4caf50;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin-top: 2px;
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:hover {
+            background: #f0f0f0;
+        }
+
+        .autocomplete-item-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .autocomplete-item-details {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
@@ -998,6 +1072,347 @@
         let displayMode = 'emoji'; // 'emoji' or 'text'
 
         // ========================================
+        // ATTACK DATABASE FOR AUTOCOMPLETE
+        // ========================================
+
+        const ATTACK_DATABASE = [
+            // Cantrips - Spell Attacks
+            {
+                name: 'Fire Bolt',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d10', bonus: 0, damageType: 'fire' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Eldritch Blast',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d10', bonus: 0, damageType: 'force' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Ray of Frost',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'cold' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Shocking Grasp',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'lightning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Chill Touch',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            // Cantrips - Saving Throws
+            {
+                name: 'Sacred Flame',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'radiant' }],
+                saveDC: 13,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Toll the Dead',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d12', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 13,
+                saveType: 'WIS'
+            },
+            {
+                name: 'Poison Spray',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d12', bonus: 0, damageType: 'poison' }],
+                saveDC: 13,
+                saveType: 'CON'
+            },
+            {
+                name: 'Acid Splash',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d6', bonus: 0, damageType: 'acid' }],
+                saveDC: 13,
+                saveType: 'DEX'
+            },
+            // Level 1 Spells
+            {
+                name: 'Magic Missile',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d4', bonus: 3, damageType: 'force' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Guiding Bolt',
+                attackBonus: 0,
+                damageComponents: [{ dice: '4d6', bonus: 0, damageType: 'radiant' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Inflict Wounds',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d10', bonus: 0, damageType: 'necrotic' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Chromatic Orb',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d8', bonus: 0, damageType: 'fire' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Burning Hands',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d6', bonus: 0, damageType: 'fire' }],
+                saveDC: 13,
+                saveType: 'DEX'
+            },
+            // Level 2 Spells
+            {
+                name: 'Scorching Ray',
+                attackBonus: 0,
+                damageComponents: [{ dice: '2d6', bonus: 0, damageType: 'fire' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Spiritual Weapon',
+                attackBonus: 0,
+                damageComponents: [{ dice: '1d8', bonus: 0, damageType: 'force' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Shatter',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d8', bonus: 0, damageType: 'thunder' }],
+                saveDC: 13,
+                saveType: 'CON'
+            },
+            // Level 3 Spells
+            {
+                name: 'Fireball',
+                attackBonus: 0,
+                damageComponents: [{ dice: '8d6', bonus: 0, damageType: 'fire' }],
+                saveDC: 15,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Lightning Bolt',
+                attackBonus: 0,
+                damageComponents: [{ dice: '8d6', bonus: 0, damageType: 'lightning' }],
+                saveDC: 15,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Spirit Guardians',
+                attackBonus: 0,
+                damageComponents: [{ dice: '3d8', bonus: 0, damageType: 'radiant' }],
+                saveDC: 15,
+                saveType: 'WIS'
+            },
+            // Weapon Attacks - One-Handed
+            {
+                name: 'Longsword',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Shortsword',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Rapier',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Scimitar',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Dagger',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d4', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Mace',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Battleaxe',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Warhammer',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            // Weapon Attacks - Two-Handed
+            {
+                name: 'Greatsword',
+                attackBonus: 5,
+                damageComponents: [{ dice: '2d6', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Greataxe',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d12', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Maul',
+                attackBonus: 5,
+                damageComponents: [{ dice: '2d6', bonus: 3, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Greatsword +1',
+                attackBonus: 6,
+                damageComponents: [{ dice: '2d6', bonus: 4, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            // Ranged Weapons
+            {
+                name: 'Longbow',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Shortbow',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Heavy Crossbow',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d10', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Light Crossbow',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d8', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Hand Crossbow',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            // Versatile Weapons
+            {
+                name: 'Quarterstaff',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Spear',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            // Thrown Weapons
+            {
+                name: 'Javelin',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Handaxe',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            // Unarmed/Natural Attacks
+            {
+                name: 'Unarmed Strike',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d4', bonus: 3, damageType: 'bludgeoning' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Bite',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d6', bonus: 3, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Claw',
+                attackBonus: 5,
+                damageComponents: [{ dice: '1d4', bonus: 3, damageType: 'slashing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            // Class Features
+            {
+                name: 'Sneak Attack',
+                attackBonus: 0,
+                damageComponents: [{ dice: '4d6', bonus: 0, damageType: 'piercing' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            },
+            {
+                name: 'Divine Smite',
+                attackBonus: 0,
+                damageComponents: [{ dice: '2d8', bonus: 0, damageType: 'radiant' }],
+                saveDC: 0,
+                saveType: 'DEX'
+            }
+        ];
+
+        // ========================================
         // DICE ROLLING FUNCTIONS
         // ========================================
 
@@ -1115,6 +1530,120 @@
                 minionBtn.textContent = minionCount > 0 ? `🎲 Roll (${minionCount})` : '🎲 Roll';
             }
         }
+
+        // ========================================
+        // AUTOCOMPLETE FUNCTIONS
+        // ========================================
+
+        let activeAutocompleteInput = null;
+
+        function findAttackMatches(input) {
+            if (!input) return [];
+            const lowerInput = input.toLowerCase();
+            return ATTACK_DATABASE.filter(attack =>
+                attack.name.toLowerCase().startsWith(lowerInput)
+            ).slice(0, 5); // Limit to 5 suggestions
+        }
+
+        function applyAttackTemplate(attackId, template, type = 'character', minionId = null) {
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.name = template.name;
+                    attack.attackBonus = template.attackBonus;
+                    attack.saveDC = template.saveDC;
+                    attack.saveType = template.saveType;
+
+                    // Clone damage components with new IDs
+                    attack.damageComponents = template.damageComponents.map(comp => ({
+                        id: damageComponentIdCounter++,
+                        dice: comp.dice,
+                        bonus: comp.bonus,
+                        damageType: comp.damageType
+                    }));
+
+                    renderCharacterAttacks();
+                    saveState();
+                }
+            } else {
+                const minion = minions.find(m => m.id === minionId);
+                if (minion) {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        attack.name = template.name;
+                        attack.attackBonus = template.attackBonus;
+                        attack.saveDC = template.saveDC;
+                        attack.saveType = template.saveType;
+
+                        // Clone damage components with new IDs
+                        attack.damageComponents = template.damageComponents.map(comp => ({
+                            id: damageComponentIdCounter++,
+                            dice: comp.dice,
+                            bonus: comp.bonus,
+                            damageType: comp.damageType
+                        }));
+
+                        renderMinions();
+                        saveState();
+                    }
+                }
+            }
+        }
+
+        function handleAttackNameInput(event, attackId, type = 'character', minionId = null) {
+            const input = event.target.value;
+            const matches = findAttackMatches(input);
+
+            // Get or create dropdown
+            let dropdown = event.target.nextElementSibling;
+            if (!dropdown || !dropdown.classList.contains('autocomplete-dropdown')) {
+                dropdown = document.createElement('div');
+                dropdown.className = 'autocomplete-dropdown';
+                event.target.parentNode.insertBefore(dropdown, event.target.nextSibling);
+            }
+
+            if (matches.length > 0 && input) {
+                dropdown.innerHTML = matches.map((match, index) => {
+                    const damageSummary = getDamageSummary(match.damageComponents);
+                    const saveInfo = match.saveDC > 0 ? `DC${match.saveDC} ${match.saveType}` : '';
+                    const hitInfo = match.attackBonus !== 0 ? `+${match.attackBonus} to hit` : '';
+                    const details = [hitInfo, damageSummary, saveInfo].filter(x => x).join(' | ');
+                    const escapedName = match.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                    return `
+                        <div class="autocomplete-item" onclick="event.stopPropagation(); selectAutocomplete('${escapedName}', ${attackId}, '${type}', ${minionId})">
+                            <div class="autocomplete-item-name">${match.name}</div>
+                            <div class="autocomplete-item-details">${details}</div>
+                        </div>
+                    `;
+                }).join('');
+                dropdown.style.display = 'block';
+                activeAutocompleteInput = event.target;
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function selectAutocomplete(attackName, attackId, type = 'character', minionId = null) {
+            const template = ATTACK_DATABASE.find(a => a.name === attackName);
+            if (template) {
+                applyAttackTemplate(attackId, template, type, minionId);
+            }
+
+            // Hide all dropdowns
+            document.querySelectorAll('.autocomplete-dropdown').forEach(dd => {
+                dd.style.display = 'none';
+            });
+        }
+
+        // Close autocomplete when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.attack-details')) {
+                document.querySelectorAll('.autocomplete-dropdown').forEach(dd => {
+                    dd.style.display = 'none';
+                });
+            }
+        });
 
         // ========================================
         // DAMAGE COMPONENT FUNCTIONS
@@ -1241,7 +1770,7 @@
                 advantage: 'normal',
                 rollCount: 1,
                 selected: false,
-                expanded: true
+                expanded: false
             };
             characterAttacks.push(attack);
             renderCharacterAttacks();
@@ -1339,12 +1868,15 @@
                         <div class="expand-icon">▼</div>
                     </div>
                     <div class="attack-details">
-                        <input type="text"
-                               value="${attack.name}"
-                               placeholder="Attack Name"
-                               style="margin-bottom: 8px; font-weight: bold;"
-                               onchange="updateCharacterAttack(${attack.id}, 'name', this.value)"
-                               onclick="event.stopPropagation()">
+                        <div style="position: relative; margin-bottom: 8px;">
+                            <input type="text"
+                                   value="${attack.name}"
+                                   placeholder="Attack Name (type to autocomplete)"
+                                   style="font-weight: bold; width: 100%;"
+                                   oninput="handleAttackNameInput(event, ${attack.id}, 'character')"
+                                   onchange="updateCharacterAttack(${attack.id}, 'name', this.value)"
+                                   onclick="event.stopPropagation()">
+                        </div>
 
                         <div class="attack-grid">
                             <div class="form-group">
@@ -1479,7 +2011,7 @@
                         advantage: 'normal',
                         rollCount: 1,
                         selected: false,
-                        expanded: i === 0 // Only expand the first one
+                        expanded: false
                     };
                     minion.attacks.push(attack);
                 }
@@ -1633,12 +2165,15 @@
                                            style="width: 60px; font-weight: bold;"
                                            onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'minionIdentifier', this.value)"
                                            onclick="event.stopPropagation()">
-                                    <input type="text"
-                                           value="${attack.name}"
-                                           placeholder="Attack"
-                                           style="flex: 1; font-weight: bold;"
-                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'name', this.value)"
-                                           onclick="event.stopPropagation()">
+                                    <div style="position: relative; flex: 1;">
+                                        <input type="text"
+                                               value="${attack.name}"
+                                               placeholder="Attack (type to autocomplete)"
+                                               style="font-weight: bold; width: 100%;"
+                                               oninput="handleAttackNameInput(event, ${attack.id}, 'minion', ${minion.id})"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'name', this.value)"
+                                               onclick="event.stopPropagation()">
+                                    </div>
                                 </div>
 
                                 <div class="attack-grid">
