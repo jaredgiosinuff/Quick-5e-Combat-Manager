@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick 5e Combat Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.5em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .attack-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .attack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .attack-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .attack-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .attack-controls-full {
+            grid-column: 1 / -1;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .advantage-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .advantage-selector label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .minion-item {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 2px solid #2a5298;
+        }
+
+        .minion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .minion-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .results-area {
+            grid-column: 1 / -1;
+        }
+
+        .result-item {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #28a745;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .result-header {
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .result-details {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dice-result {
+            display: inline-block;
+            background: #2a5298;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            font-weight: bold;
+        }
+
+        .critical-success {
+            border-left-color: #ffd700;
+            background: #fffbea;
+        }
+
+        .critical-failure {
+            border-left-color: #dc3545;
+            background: #ffe6e6;
+        }
+
+        .inline-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .quick-dice {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .dice-btn {
+            padding: 8px 16px;
+            background: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .dice-btn:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        #clearResults {
+            margin-top: 10px;
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ Quick 5e Combat Manager ⚔️</h1>
+
+        <div class="main-grid">
+            <!-- Character Section -->
+            <div class="card">
+                <h2>Character</h2>
+                <div class="input-group">
+                    <label for="characterName">Character Name</label>
+                    <input type="text" id="characterName" placeholder="Enter character name">
+                </div>
+
+                <h3 style="margin-top: 20px; margin-bottom: 10px; color: #1e3c72;">Attacks</h3>
+                <div id="characterAttacks"></div>
+                <button class="btn btn-success" onclick="addCharacterAttack()">+ Add Attack</button>
+
+                <h3 style="margin-top: 20px; margin-bottom: 10px; color: #1e3c72;">Quick Dice Roller</h3>
+                <div class="quick-dice">
+                    <button class="dice-btn" onclick="rollQuickDice('d4')">d4</button>
+                    <button class="dice-btn" onclick="rollQuickDice('d6')">d6</button>
+                    <button class="dice-btn" onclick="rollQuickDice('d8')">d8</button>
+                    <button class="dice-btn" onclick="rollQuickDice('d10')">d10</button>
+                    <button class="dice-btn" onclick="rollQuickDice('d12')">d12</button>
+                    <button class="dice-btn" onclick="rollQuickDice('d20')">d20</button>
+                    <button class="dice-btn" onclick="rollQuickDice('d100')">d100</button>
+                </div>
+            </div>
+
+            <!-- Minions Section -->
+            <div class="card">
+                <h2>Minions</h2>
+                <div id="minionsList"></div>
+                <button class="btn btn-success" onclick="addMinion()">+ Add Minion</button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card results-area">
+                <h2>Combat Log</h2>
+                <button class="btn btn-danger btn-small" id="clearResults" onclick="clearResults()">Clear Log</button>
+                <div id="results">
+                    <div class="empty-state">No rolls yet. Start rolling attacks!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structures
+        let characterAttacks = [];
+        let minions = [];
+        let attackIdCounter = 0;
+        let minionIdCounter = 0;
+
+        // Dice rolling functions
+        function rollDie(sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        }
+
+        function rollDice(notation) {
+            // Parse dice notation like "2d6+3" or "1d20"
+            const regex = /(\d+)d(\d+)([+-]\d+)?/i;
+            const match = notation.match(regex);
+
+            if (!match) return null;
+
+            const count = parseInt(match[1]);
+            const sides = parseInt(match[2]);
+            const modifier = match[3] ? parseInt(match[3]) : 0;
+
+            let rolls = [];
+            let total = modifier;
+
+            for (let i = 0; i < count; i++) {
+                const roll = rollDie(sides);
+                rolls.push(roll);
+                total += roll;
+            }
+
+            return { rolls, total, modifier, count, sides };
+        }
+
+        function rollWithAdvantage(modifier = 0) {
+            const roll1 = rollDie(20);
+            const roll2 = rollDie(20);
+            const higher = Math.max(roll1, roll2);
+            return {
+                rolls: [roll1, roll2],
+                result: higher + modifier,
+                chosen: higher,
+                modifier: modifier
+            };
+        }
+
+        function rollWithDisadvantage(modifier = 0) {
+            const roll1 = rollDie(20);
+            const roll2 = rollDie(20);
+            const lower = Math.min(roll1, roll2);
+            return {
+                rolls: [roll1, roll2],
+                result: lower + modifier,
+                chosen: lower,
+                modifier: modifier
+            };
+        }
+
+        function rollNormal(modifier = 0) {
+            const roll = rollDie(20);
+            return {
+                rolls: [roll],
+                result: roll + modifier,
+                chosen: roll,
+                modifier: modifier
+            };
+        }
+
+        // Character attack functions
+        function addCharacterAttack() {
+            const attack = {
+                id: attackIdCounter++,
+                name: '',
+                attackBonus: 0,
+                damage: '1d6',
+                saveDC: 0,
+                saveType: 'DEX'
+            };
+            characterAttacks.push(attack);
+            renderCharacterAttacks();
+        }
+
+        function removeCharacterAttack(id) {
+            characterAttacks = characterAttacks.filter(a => a.id !== id);
+            renderCharacterAttacks();
+        }
+
+        function renderCharacterAttacks() {
+            const container = document.getElementById('characterAttacks');
+            if (characterAttacks.length === 0) {
+                container.innerHTML = '<div class="empty-state">No attacks added yet.</div>';
+                return;
+            }
+
+            container.innerHTML = characterAttacks.map(attack => `
+                <div class="attack-item">
+                    <div class="attack-header">
+                        <input type="text"
+                               class="attack-name"
+                               placeholder="Attack Name"
+                               value="${attack.name}"
+                               onchange="updateCharacterAttack(${attack.id}, 'name', this.value)"
+                               style="border: none; background: transparent; width: 70%;">
+                        <button class="btn btn-danger btn-small" onclick="removeCharacterAttack(${attack.id})">Remove</button>
+                    </div>
+                    <div class="attack-controls">
+                        <div>
+                            <label style="font-size: 12px;">Attack Bonus</label>
+                            <input type="number"
+                                   value="${attack.attackBonus}"
+                                   onchange="updateCharacterAttack(${attack.id}, 'attackBonus', parseInt(this.value))"
+                                   style="padding: 5px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px;">Damage</label>
+                            <input type="text"
+                                   value="${attack.damage}"
+                                   placeholder="e.g., 2d6+3"
+                                   onchange="updateCharacterAttack(${attack.id}, 'damage', this.value)"
+                                   style="padding: 5px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px;">Save DC</label>
+                            <input type="number"
+                                   value="${attack.saveDC}"
+                                   onchange="updateCharacterAttack(${attack.id}, 'saveDC', parseInt(this.value))"
+                                   style="padding: 5px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px;">Save Type</label>
+                            <select onchange="updateCharacterAttack(${attack.id}, 'saveType', this.value)"
+                                    style="padding: 5px;">
+                                <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
+                                <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
+                                <option value="CON" ${attack.saveType === 'CON' ? 'selected' : ''}>CON</option>
+                                <option value="INT" ${attack.saveType === 'INT' ? 'selected' : ''}>INT</option>
+                                <option value="WIS" ${attack.saveType === 'WIS' ? 'selected' : ''}>WIS</option>
+                                <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="advantage-selector">
+                        <label>
+                            <input type="radio" name="adv-char-${attack.id}" value="normal" checked>
+                            Normal
+                        </label>
+                        <label>
+                            <input type="radio" name="adv-char-${attack.id}" value="advantage">
+                            Advantage
+                        </label>
+                        <label>
+                            <input type="radio" name="adv-char-${attack.id}" value="disadvantage">
+                            Disadvantage
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" onclick="rollCharacterAttack(${attack.id})">Roll Attack</button>
+                </div>
+            `).join('');
+        }
+
+        function updateCharacterAttack(id, field, value) {
+            const attack = characterAttacks.find(a => a.id === id);
+            if (attack) {
+                attack[field] = value;
+            }
+        }
+
+        function rollCharacterAttack(id) {
+            const attack = characterAttacks.find(a => a.id === id);
+            if (!attack) return;
+
+            const characterName = document.getElementById('characterName').value || 'Character';
+            const attackName = attack.name || 'Unnamed Attack';
+            const advantageType = document.querySelector(`input[name="adv-char-${id}"]:checked`).value;
+
+            let attackRoll;
+            if (advantageType === 'advantage') {
+                attackRoll = rollWithAdvantage(attack.attackBonus);
+            } else if (advantageType === 'disadvantage') {
+                attackRoll = rollWithDisadvantage(attack.attackBonus);
+            } else {
+                attackRoll = rollNormal(attack.attackBonus);
+            }
+
+            const damageRoll = rollDice(attack.damage);
+
+            let resultClass = '';
+            if (attackRoll.chosen === 20) resultClass = 'critical-success';
+            if (attackRoll.chosen === 1) resultClass = 'critical-failure';
+
+            const advantageText = advantageType === 'advantage' ? ' (Advantage)' :
+                                 advantageType === 'disadvantage' ? ' (Disadvantage)' : '';
+
+            let resultHTML = `
+                <div class="result-item ${resultClass}">
+                    <div class="result-header">${characterName} - ${attackName}${advantageText}</div>
+                    <div class="result-details">
+                        <strong>Attack Roll:</strong>
+                        ${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}
+                        ${attackRoll.modifier !== 0 ? ` + ${attackRoll.modifier}` : ''}
+                        = <strong>${attackRoll.result}</strong>
+                        ${attackRoll.chosen === 20 ? ' 🎯 CRITICAL!' : ''}
+                        ${attackRoll.chosen === 1 ? ' 💥 CRITICAL MISS!' : ''}
+                    </div>
+            `;
+
+            if (damageRoll) {
+                const isCrit = attackRoll.chosen === 20;
+                const finalDamage = isCrit ? damageRoll.total * 2 : damageRoll.total;
+
+                resultHTML += `
+                    <div class="result-details">
+                        <strong>Damage:</strong>
+                        ${damageRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}
+                        ${damageRoll.modifier !== 0 ? ` + ${damageRoll.modifier}` : ''}
+                        = <strong>${finalDamage}</strong>
+                        ${isCrit ? ' (Doubled for crit!)' : ''}
+                    </div>
+                `;
+            }
+
+            if (attack.saveDC > 0) {
+                resultHTML += `
+                    <div class="result-details">
+                        <strong>Save:</strong> DC ${attack.saveDC} ${attack.saveType}
+                    </div>
+                `;
+            }
+
+            resultHTML += `</div>`;
+
+            addResult(resultHTML);
+        }
+
+        // Minion functions
+        function addMinion() {
+            const minion = {
+                id: minionIdCounter++,
+                name: '',
+                attacks: []
+            };
+            minions.push(minion);
+            renderMinions();
+        }
+
+        function removeMinion(id) {
+            minions = minions.filter(m => m.id !== id);
+            renderMinions();
+        }
+
+        function addMinionAttack(minionId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = {
+                    id: attackIdCounter++,
+                    name: '',
+                    attackBonus: 0,
+                    damage: '1d6',
+                    saveDC: 0,
+                    saveType: 'DEX'
+                };
+                minion.attacks.push(attack);
+                renderMinions();
+            }
+        }
+
+        function removeMinionAttack(minionId, attackId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                minion.attacks = minion.attacks.filter(a => a.id !== attackId);
+                renderMinions();
+            }
+        }
+
+        function updateMinion(id, field, value) {
+            const minion = minions.find(m => m.id === id);
+            if (minion) {
+                minion[field] = value;
+            }
+        }
+
+        function updateMinionAttack(minionId, attackId, field, value) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack[field] = value;
+                }
+            }
+        }
+
+        function renderMinions() {
+            const container = document.getElementById('minionsList');
+            if (minions.length === 0) {
+                container.innerHTML = '<div class="empty-state">No minions added yet.</div>';
+                return;
+            }
+
+            container.innerHTML = minions.map(minion => `
+                <div class="minion-item">
+                    <div class="minion-header">
+                        <input type="text"
+                               class="minion-name"
+                               placeholder="Minion Name"
+                               value="${minion.name}"
+                               onchange="updateMinion(${minion.id}, 'name', this.value)"
+                               style="border: none; background: transparent; width: 70%;">
+                        <button class="btn btn-danger btn-small" onclick="removeMinion(${minion.id})">Remove</button>
+                    </div>
+
+                    <div>
+                        ${minion.attacks.map(attack => `
+                            <div class="attack-item" style="margin-top: 10px;">
+                                <div class="attack-header">
+                                    <input type="text"
+                                           placeholder="Attack Name"
+                                           value="${attack.name}"
+                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'name', this.value)"
+                                           style="border: none; background: transparent; font-size: 16px; font-weight: bold; width: 70%;">
+                                    <button class="btn btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})">Remove</button>
+                                </div>
+                                <div class="attack-controls">
+                                    <div>
+                                        <label style="font-size: 12px;">Attack Bonus</label>
+                                        <input type="number"
+                                               value="${attack.attackBonus}"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'attackBonus', parseInt(this.value))"
+                                               style="padding: 5px;">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 12px;">Damage</label>
+                                        <input type="text"
+                                               value="${attack.damage}"
+                                               placeholder="e.g., 2d6+3"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'damage', this.value)"
+                                               style="padding: 5px;">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 12px;">Save DC</label>
+                                        <input type="number"
+                                               value="${attack.saveDC}"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveDC', parseInt(this.value))"
+                                               style="padding: 5px;">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 12px;">Save Type</label>
+                                        <select onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveType', this.value)"
+                                                style="padding: 5px;">
+                                            <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
+                                            <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
+                                            <option value="CON" ${attack.saveType === 'CON' ? 'selected' : ''}>CON</option>
+                                            <option value="INT" ${attack.saveType === 'INT' ? 'selected' : ''}>INT</option>
+                                            <option value="WIS" ${attack.saveType === 'WIS' ? 'selected' : ''}>WIS</option>
+                                            <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="advantage-selector">
+                                    <label>
+                                        <input type="radio" name="adv-minion-${minion.id}-${attack.id}" value="normal" checked>
+                                        Normal
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="adv-minion-${minion.id}-${attack.id}" value="advantage">
+                                        Advantage
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="adv-minion-${minion.id}-${attack.id}" value="disadvantage">
+                                        Disadvantage
+                                    </label>
+                                </div>
+                                <button class="btn btn-primary btn-small" onclick="rollMinionAttack(${minion.id}, ${attack.id})">Roll Attack</button>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <button class="btn btn-success btn-small" style="margin-top: 10px;" onclick="addMinionAttack(${minion.id})">+ Add Attack</button>
+                </div>
+            `).join('');
+        }
+
+        function rollMinionAttack(minionId, attackId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (!minion) return;
+
+            const attack = minion.attacks.find(a => a.id === attackId);
+            if (!attack) return;
+
+            const minionName = minion.name || 'Unnamed Minion';
+            const attackName = attack.name || 'Unnamed Attack';
+            const advantageType = document.querySelector(`input[name="adv-minion-${minionId}-${attackId}"]:checked`).value;
+
+            let attackRoll;
+            if (advantageType === 'advantage') {
+                attackRoll = rollWithAdvantage(attack.attackBonus);
+            } else if (advantageType === 'disadvantage') {
+                attackRoll = rollWithDisadvantage(attack.attackBonus);
+            } else {
+                attackRoll = rollNormal(attack.attackBonus);
+            }
+
+            const damageRoll = rollDice(attack.damage);
+
+            let resultClass = '';
+            if (attackRoll.chosen === 20) resultClass = 'critical-success';
+            if (attackRoll.chosen === 1) resultClass = 'critical-failure';
+
+            const advantageText = advantageType === 'advantage' ? ' (Advantage)' :
+                                 advantageType === 'disadvantage' ? ' (Disadvantage)' : '';
+
+            let resultHTML = `
+                <div class="result-item ${resultClass}">
+                    <div class="result-header">${minionName} - ${attackName}${advantageText}</div>
+                    <div class="result-details">
+                        <strong>Attack Roll:</strong>
+                        ${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}
+                        ${attackRoll.modifier !== 0 ? ` + ${attackRoll.modifier}` : ''}
+                        = <strong>${attackRoll.result}</strong>
+                        ${attackRoll.chosen === 20 ? ' 🎯 CRITICAL!' : ''}
+                        ${attackRoll.chosen === 1 ? ' 💥 CRITICAL MISS!' : ''}
+                    </div>
+            `;
+
+            if (damageRoll) {
+                const isCrit = attackRoll.chosen === 20;
+                const finalDamage = isCrit ? damageRoll.total * 2 : damageRoll.total;
+
+                resultHTML += `
+                    <div class="result-details">
+                        <strong>Damage:</strong>
+                        ${damageRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}
+                        ${damageRoll.modifier !== 0 ? ` + ${damageRoll.modifier}` : ''}
+                        = <strong>${finalDamage}</strong>
+                        ${isCrit ? ' (Doubled for crit!)' : ''}
+                    </div>
+                `;
+            }
+
+            if (attack.saveDC > 0) {
+                resultHTML += `
+                    <div class="result-details">
+                        <strong>Save:</strong> DC ${attack.saveDC} ${attack.saveType}
+                    </div>
+                `;
+            }
+
+            resultHTML += `</div>`;
+
+            addResult(resultHTML);
+        }
+
+        // Quick dice roller
+        function rollQuickDice(diceType) {
+            const sides = parseInt(diceType.substring(1));
+            const roll = rollDie(sides);
+
+            const resultHTML = `
+                <div class="result-item">
+                    <div class="result-header">Quick Roll - ${diceType}</div>
+                    <div class="result-details">
+                        <span class="dice-result">${roll}</span>
+                    </div>
+                </div>
+            `;
+
+            addResult(resultHTML);
+        }
+
+        // Results functions
+        function addResult(html) {
+            const resultsDiv = document.getElementById('results');
+
+            // Remove empty state if it exists
+            const emptyState = resultsDiv.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            // Add new result at the top
+            resultsDiv.insertAdjacentHTML('afterbegin', html);
+        }
+
+        function clearResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="empty-state">No rolls yet. Start rolling attacks!</div>';
+        }
+
+        // Initialize
+        renderCharacterAttacks();
+        renderMinions();
+    </script>
+</body>
+</html>
