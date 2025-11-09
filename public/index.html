@@ -2261,10 +2261,14 @@
                     const saveInfo = match.saveDC > 0 ? `DC${match.saveDC} ${match.saveType}` : '';
                     const hitInfo = match.attackBonus !== 0 ? `+${match.attackBonus} to hit` : '';
                     const details = [hitInfo, damageSummary, saveInfo].filter(x => x).join(' | ');
-                    const escapedName = match.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                     return `
-                        <div class="autocomplete-item" onclick="event.stopPropagation(); selectAutocomplete('${escapedName}', ${attackId}, '${type}', ${minionId})">
+                        <div class="autocomplete-item"
+                             data-attack-name="${match.name.replace(/"/g, '&quot;')}"
+                             data-attack-id="${attackId}"
+                             data-attack-type="${type}"
+                             data-minion-id="${minionId}"
+                             onclick="event.stopPropagation(); selectAutocompleteByData(this)">
                             <div class="autocomplete-item-name">${match.name}</div>
                             <div class="autocomplete-item-details">${details}</div>
                         </div>
@@ -2275,6 +2279,15 @@
             } else {
                 dropdown.style.display = 'none';
             }
+        }
+
+        function selectAutocompleteByData(element) {
+            const attackName = element.getAttribute('data-attack-name');
+            const attackId = parseInt(element.getAttribute('data-attack-id'));
+            const type = element.getAttribute('data-attack-type');
+            const minionId = element.getAttribute('data-minion-id') !== 'null' ? parseInt(element.getAttribute('data-minion-id')) : null;
+
+            selectAutocomplete(attackName, attackId, type, minionId);
         }
 
         function selectAutocomplete(attackName, attackId, type = 'character', minionId = null) {
