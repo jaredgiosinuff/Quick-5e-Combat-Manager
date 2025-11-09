@@ -32,6 +32,27 @@
             margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .settings-toggle {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .settings-toggle:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.95);
         }
 
         .main-grid {
@@ -217,7 +238,8 @@
         .attack-item.selected {
             background: #e3f2fd;
             border-color: #2a5298;
-            box-shadow: 0 0 0 2px rgba(42, 82, 152, 0.1);
+            border-width: 3px;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.2), 0 4px 8px rgba(42, 82, 152, 0.15);
         }
 
         .attack-compact {
@@ -528,7 +550,9 @@
             }
 
             h1 {
-                font-size: 1.2em;
+                font-size: 1.1em;
+                flex-direction: column;
+                gap: 10px;
             }
 
             .damage-component {
@@ -537,14 +561,25 @@
 
             .batch-controls button {
                 flex: 1;
-                min-width: 120px;
+                min-width: 100px;
+            }
+
+            .attack-stats {
+                font-size: 10px;
+            }
+
+            .stat-badge {
+                padding: 1px 4px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚔️ Quick 5e Combat</h1>
+        <h1>
+            <span>⚔️ Quick 5e Combat</span>
+            <span class="settings-toggle" onclick="toggleDisplayMode()" id="displayModeToggle">🎨 Emoji</span>
+        </h1>
 
         <div class="main-grid">
             <!-- Character Section -->
@@ -557,7 +592,7 @@
                 </div>
 
                 <div class="batch-controls">
-                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('character')" style="flex: 1;">🎲 Roll</button>
+                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('character')" style="flex: 1;" id="charRollBtn">🎲 Roll</button>
                     <button class="btn-info" onclick="repeatLastRoll()">🔄</button>
                     <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', true)">All</button>
                     <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', false)">None</button>
@@ -586,7 +621,7 @@
                 <h2>Minions</h2>
 
                 <div class="batch-controls">
-                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('minions')" style="flex: 1;">🎲 Roll</button>
+                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('minions')" style="flex: 1;" id="minionRollBtn">🎲 Roll</button>
                     <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', true)">All</button>
                     <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', false)">None</button>
                 </div>
@@ -623,6 +658,50 @@
             'lightning', 'thunder', 'force', 'psychic'
         ];
 
+        const DAMAGE_TYPE_EMOJI = {
+            'slashing': '⚔️',
+            'piercing': '🗡️',
+            'bludgeoning': '🔨',
+            'fire': '🔥',
+            'cold': '❄️',
+            'lightning': '⚡',
+            'thunder': '🌩️',
+            'acid': '🧪',
+            'radiant': '✨',
+            'necrotic': '💀',
+            'force': '💫',
+            'poison': '☠️',
+            'psychic': '🧠'
+        };
+
+        const DAMAGE_TYPE_ABBR = {
+            'slashing': 'sla',
+            'piercing': 'pie',
+            'bludgeoning': 'blu',
+            'fire': 'fir',
+            'cold': 'cld',
+            'lightning': 'lit',
+            'thunder': 'thu',
+            'acid': 'acd',
+            'radiant': 'rad',
+            'necrotic': 'nec',
+            'force': 'frc',
+            'poison': 'poi',
+            'psychic': 'psy'
+        };
+
+        const ADVANTAGE_EMOJI = {
+            'advantage': '🎲↑',
+            'disadvantage': '🎲↓',
+            'normal': ''
+        };
+
+        const ADVANTAGE_TEXT = {
+            'advantage': 'ADV',
+            'disadvantage': 'DIS',
+            'normal': ''
+        };
+
         // ========================================
         // STATE MANAGEMENT
         // ========================================
@@ -635,6 +714,7 @@
         let attackIdCounter = 0;
         let minionIdCounter = 0;
         let damageComponentIdCounter = 0;
+        let displayMode = 'emoji'; // 'emoji' or 'text'
 
         // ========================================
         // DICE ROLLING FUNCTIONS
@@ -707,11 +787,52 @@
             }
         }
 
+        function toggleDisplayMode() {
+            displayMode = displayMode === 'emoji' ? 'text' : 'emoji';
+            const toggleBtn = document.getElementById('displayModeToggle');
+            toggleBtn.textContent = displayMode === 'emoji' ? '🎨 Emoji' : '🔤 Text';
+            renderCharacterAttacks();
+            renderMinions();
+            saveState();
+        }
+
+        function getDamageTypeDisplay(damageType) {
+            if (displayMode === 'emoji') {
+                return DAMAGE_TYPE_EMOJI[damageType] || damageType;
+            } else {
+                return DAMAGE_TYPE_ABBR[damageType] || damageType.substring(0,3);
+            }
+        }
+
+        function getAdvantageDisplay(advantage) {
+            if (displayMode === 'emoji') {
+                return ADVANTAGE_EMOJI[advantage] || '';
+            } else {
+                return ADVANTAGE_TEXT[advantage] || '';
+            }
+        }
+
         function getDamageSummary(damageComponents) {
             return damageComponents.map(c => {
                 const bonus = c.bonus !== 0 ? (c.bonus > 0 ? `+${c.bonus}` : c.bonus) : '';
-                return `${c.dice}${bonus} ${c.damageType.substring(0,3)}`;
+                const typeDisplay = getDamageTypeDisplay(c.damageType);
+                return `${c.dice}${bonus} ${typeDisplay}`;
             }).join(' + ');
+        }
+
+        function updateRollButtonCounts() {
+            const charCount = characterAttacks.filter(a => a.selected).length;
+            const minionCount = minions.reduce((count, m) => count + m.attacks.filter(a => a.selected).length, 0);
+
+            const charBtn = document.getElementById('charRollBtn');
+            const minionBtn = document.getElementById('minionRollBtn');
+
+            if (charBtn) {
+                charBtn.textContent = charCount > 0 ? `🎲 Roll (${charCount})` : '🎲 Roll';
+            }
+            if (minionBtn) {
+                minionBtn.textContent = minionCount > 0 ? `🎲 Roll (${minionCount})` : '🎲 Roll';
+            }
         }
 
         // ========================================
@@ -895,6 +1016,7 @@
 
             container.innerHTML = characterAttacks.map(attack => {
                 const damageSummary = getDamageSummary(attack.damageComponents);
+                const advDisplay = getAdvantageDisplay(attack.advantage);
                 return `
                 <div class="attack-item ${attack.selected ? 'selected' : ''} ${attack.expanded ? 'expanded' : ''}" data-attack-id="${attack.id}">
                     <div class="attack-compact" onclick="toggleExpand(${attack.id}, 'character')">
@@ -907,6 +1029,7 @@
                             <div class="attack-stats">
                                 <span class="stat-badge stat-hit">+${attack.attackBonus}</span>
                                 <span class="stat-badge stat-dmg">${damageSummary}</span>
+                                ${advDisplay ? `<span class="stat-badge" style="background: #fff3cd; color: #856404;">${advDisplay}</span>` : ''}
                                 ${attack.saveDC > 0 ? `<span class="stat-badge stat-save">DC${attack.saveDC} ${attack.saveType}</span>` : ''}
                             </div>
                         </div>
@@ -978,6 +1101,7 @@
                     </div>
                 </div>
             `}).join('');
+            updateRollButtonCounts();
         }
 
         // ========================================
@@ -1090,6 +1214,7 @@
 
                     ${minion.attacks.map(attack => {
                         const damageSummary = getDamageSummary(attack.damageComponents);
+                        const advDisplay = getAdvantageDisplay(attack.advantage);
                         return `
                         <div class="attack-item ${attack.selected ? 'selected' : ''} ${attack.expanded ? 'expanded' : ''}" data-attack-id="${attack.id}" style="background: white;">
                             <div class="attack-compact" onclick="toggleExpand(${attack.id}, 'minion')">
@@ -1102,6 +1227,7 @@
                                     <div class="attack-stats">
                                         <span class="stat-badge stat-hit">+${attack.attackBonus}</span>
                                         <span class="stat-badge stat-dmg">${damageSummary}</span>
+                                        ${advDisplay ? `<span class="stat-badge" style="background: #fff3cd; color: #856404;">${advDisplay}</span>` : ''}
                                         ${attack.saveDC > 0 ? `<span class="stat-badge stat-save">DC${attack.saveDC} ${attack.saveType}</span>` : ''}
                                     </div>
                                 </div>
@@ -1188,6 +1314,7 @@
                     </div>
                 </div>
             `).join('');
+            updateRollButtonCounts();
         }
 
         // ========================================
@@ -1379,11 +1506,12 @@
                     ? `[${dr.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}]`
                     : '';
                 const bonusDisplay = dr.bonus !== 0 ? ` ${dr.bonus > 0 ? '+' : ''}${dr.bonus}` : '';
+                const typeDisplay = getDamageTypeDisplay(dr.damageType);
 
                 return `
                     <div class="damage-type-result">
                         <span>
-                            <span class="damage-type-badge dtype-${dr.damageType}">${dr.damageType.substring(0,3).toUpperCase()}</span>
+                            <span class="damage-type-badge dtype-${dr.damageType}">${typeDisplay}</span>
                             ${rollsDisplay}${bonusDisplay}
                         </span>
                         <span style="font-weight: bold;">${dr.total}</span>
@@ -1507,7 +1635,8 @@
                 lastRollConfig,
                 attackIdCounter,
                 minionIdCounter,
-                damageComponentIdCounter
+                damageComponentIdCounter,
+                displayMode
             };
             localStorage.setItem('combatManagerState', JSON.stringify(state));
         }
@@ -1525,6 +1654,13 @@
                     attackIdCounter = state.attackIdCounter || 0;
                     minionIdCounter = state.minionIdCounter || 0;
                     damageComponentIdCounter = state.damageComponentIdCounter || 0;
+                    displayMode = state.displayMode || 'emoji';
+
+                    // Update toggle button text
+                    const toggleBtn = document.getElementById('displayModeToggle');
+                    if (toggleBtn) {
+                        toggleBtn.textContent = displayMode === 'emoji' ? '🎨 Emoji' : '🔤 Text';
+                    }
 
                     document.getElementById('characterName').value = characterName;
                     renderCharacterAttacks();
@@ -1568,11 +1704,12 @@
                     ? `[${dr.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}]`
                     : '';
                 const bonusDisplay = dr.bonus !== 0 ? ` ${dr.bonus > 0 ? '+' : ''}${dr.bonus}` : '';
+                const typeDisplay = getDamageTypeDisplay(dr.damageType);
 
                 return `
                     <div class="damage-type-result">
                         <span>
-                            <span class="damage-type-badge dtype-${dr.damageType}">${dr.damageType.substring(0,3).toUpperCase()}</span>
+                            <span class="damage-type-badge dtype-${dr.damageType}">${typeDisplay}</span>
                             ${rollsDisplay}${bonusDisplay}
                         </span>
                         <span style="font-weight: bold;">${dr.total}</span>
