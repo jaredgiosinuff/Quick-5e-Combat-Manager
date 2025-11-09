@@ -2199,8 +2199,12 @@
         }
 
         function applyAttackTemplate(attackId, template, type = 'character', minionId = null) {
+            console.log('applyAttackTemplate called with:', { attackId, template, type, minionId });
+
             if (type === 'character') {
                 const attack = characterAttacks.find(a => a.id === attackId);
+                console.log('Found character attack:', attack);
+
                 if (attack) {
                     attack.name = template.name;
                     attack.attackBonus = template.attackBonus;
@@ -2215,13 +2219,19 @@
                         damageType: comp.damageType
                     }));
 
+                    console.log('Attack after template applied:', attack);
+
                     renderCharacterAttacks();
                     saveState();
                 }
             } else {
                 const minion = minions.find(m => m.id === minionId);
+                console.log('Found minion:', minion);
+
                 if (minion) {
                     const attack = minion.attacks.find(a => a.id === attackId);
+                    console.log('Found minion attack:', attack);
+
                     if (attack) {
                         attack.name = template.name;
                         attack.attackBonus = template.attackBonus;
@@ -2236,6 +2246,8 @@
                             damageType: comp.damageType
                         }));
 
+                        console.log('Minion attack after template applied:', attack);
+
                         renderMinions();
                         saveState();
                     }
@@ -2244,8 +2256,12 @@
         }
 
         function handleAttackNameInput(event, attackId, type = 'character', minionId = null) {
+            console.log('🔍 handleAttackNameInput called - input:', event.target.value);
+
             const input = event.target.value;
             const matches = findAttackMatches(input);
+
+            console.log('📋 Found', matches.length, 'matches');
 
             // Get or create dropdown
             let dropdown = event.target.nextElementSibling;
@@ -2253,47 +2269,82 @@
                 dropdown = document.createElement('div');
                 dropdown.className = 'autocomplete-dropdown';
                 event.target.parentNode.insertBefore(dropdown, event.target.nextSibling);
+                console.log('✅ Created new dropdown');
             }
 
             if (matches.length > 0 && input) {
-                dropdown.innerHTML = matches.map((match, index) => {
+                console.log('🎯 Building dropdown with', matches.length, 'items');
+
+                // Clear previous content and event listeners
+                dropdown.innerHTML = '';
+
+                matches.forEach((match, index) => {
                     const damageSummary = getDamageSummary(match.damageComponents);
                     const saveInfo = match.saveDC > 0 ? `DC${match.saveDC} ${match.saveType}` : '';
                     const hitInfo = match.attackBonus !== 0 ? `+${match.attackBonus} to hit` : '';
                     const details = [hitInfo, damageSummary, saveInfo].filter(x => x).join(' | ');
 
-                    return `
-                        <div class="autocomplete-item"
-                             data-attack-name="${match.name.replace(/"/g, '&quot;')}"
-                             data-attack-id="${attackId}"
-                             data-attack-type="${type}"
-                             data-minion-id="${minionId}"
-                             onclick="event.stopPropagation(); selectAutocompleteByData(this)">
-                            <div class="autocomplete-item-name">${match.name}</div>
-                            <div class="autocomplete-item-details">${details}</div>
-                        </div>
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.innerHTML = `
+                        <div class="autocomplete-item-name">${match.name}</div>
+                        <div class="autocomplete-item-details">${details}</div>
                     `;
-                }).join('');
+
+                    // Add click event listener directly - this is more reliable than inline onclick
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        console.log('========================================');
+                        console.log('🎯 AUTOCOMPLETE CLICKED!');
+                        console.log('Attack name:', match.name);
+                        console.log('Attack ID:', attackId);
+                        console.log('Type:', type);
+                        console.log('Minion ID:', minionId);
+                        console.log('========================================');
+                        selectAutocomplete(match.name, attackId, type, minionId);
+                    });
+
+                    dropdown.appendChild(item);
+                    console.log('  ➕ Added item:', match.name);
+                });
+
                 dropdown.style.display = 'block';
                 activeAutocompleteInput = event.target;
+                console.log('✅ Dropdown displayed');
             } else {
                 dropdown.style.display = 'none';
+                console.log('❌ No matches or empty input');
             }
         }
 
         function selectAutocompleteByData(element) {
-            const attackName = element.getAttribute('data-attack-name');
-            const attackId = parseInt(element.getAttribute('data-attack-id'));
-            const type = element.getAttribute('data-attack-type');
-            const minionId = element.getAttribute('data-minion-id') !== 'null' ? parseInt(element.getAttribute('data-minion-id')) : null;
+            // Handle clicks on child elements by finding the parent autocomplete-item
+            const item = element.closest('.autocomplete-item');
+            if (!item) {
+                console.error('Could not find autocomplete item');
+                return;
+            }
+
+            const attackName = item.getAttribute('data-attack-name');
+            const attackId = parseInt(item.getAttribute('data-attack-id'));
+            const type = item.getAttribute('data-attack-type');
+            const minionId = item.getAttribute('data-minion-id') !== 'null' ? parseInt(item.getAttribute('data-minion-id')) : null;
+
+            console.log('Autocomplete clicked:', { attackName, attackId, type, minionId });
 
             selectAutocomplete(attackName, attackId, type, minionId);
         }
 
         function selectAutocomplete(attackName, attackId, type = 'character', minionId = null) {
             const template = ATTACK_DATABASE.find(a => a.name === attackName);
+
+            console.log('Looking for template:', attackName);
+            console.log('Found template:', template);
+
             if (template) {
                 applyAttackTemplate(attackId, template, type, minionId);
+            } else {
+                console.error('Template not found for:', attackName);
             }
 
             // Hide all dropdowns
