@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quick 5e Combat Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .settings-toggle {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .settings-toggle:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.95);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .initiative-tracker {
+            grid-column: 1 / -1;
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            margin-bottom: 10px;
+        }
+
+        .initiative-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            min-height: 40px;
+            align-items: center;
+        }
+
+        .initiative-item {
+            background: white;
+            border: 2px solid #ff9800;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .initiative-item.active {
+            background: #4caf50;
+            color: white;
+            border-color: #388e3c;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        .initiative-item .init-value {
+            background: #ff9800;
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .initiative-item.active .init-value {
+            background: #2e7d32;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #2a5298;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #2a5298;
+            padding-bottom: 5px;
+        }
+
+        .combat-log-card {
+            grid-column: 1 / -1;
+            max-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .log-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .results-container {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 350px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 8px;
+            background: #f9f9f9;
+        }
+
+        .results-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .results-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .results-container::-webkit-scrollbar-thumb {
+            background: #2a5298;
+            border-radius: 10px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .character-name-input {
+            margin-bottom: 10px;
+        }
+
+        .character-name-input label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 12px;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:active {
+            background: #1e3c72;
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:active {
+            background: #218838;
+            transform: scale(0.98);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:active {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .btn-large {
+            padding: 12px 20px;
+            font-size: 15px;
+            margin: 5px 2px;
+            min-height: 44px;
+        }
+
+        .batch-controls {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* COMPACT ATTACK CARDS */
+        .attack-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .attack-item.selected {
+            background: #e3f2fd;
+            border-color: #2a5298;
+            border-width: 3px;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.2), 0 4px 8px rgba(42, 82, 152, 0.15);
+        }
+
+        .attack-compact {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .attack-compact:active {
+            background: rgba(0,0,0,0.03);
+        }
+
+        .attack-checkbox {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .attack-info {
+            flex: 1;
+            min-width: 0;
+            font-size: 13px;
+        }
+
+        .attack-name {
+            font-weight: bold;
+            color: #2a5298;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .attack-stats {
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .stat-hit { background: #c8e6c9; color: #2e7d32; }
+        .stat-dmg { background: #ffccbc; color: #d84315; }
+        .stat-save { background: #e1bee7; color: #6a1b9a; }
+
+        .expand-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #999;
+        }
+
+        .attack-details {
+            display: none;
+            padding: 8px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .attack-item.expanded .attack-details {
+            display: block;
+        }
+
+        .attack-item.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .attack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 10px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+        }
+
+        .advantage-selector {
+            display: flex;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 12px;
+        }
+
+        .advantage-selector label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .advantage-selector input[type="radio"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .damage-components {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        .damage-components h4 {
+            color: #495057;
+            margin-bottom: 6px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+        }
+
+        .damage-component {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr auto;
+            gap: 6px;
+            margin-bottom: 6px;
+            padding: 6px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            align-items: end;
+        }
+
+        .damage-type-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            margin: 2px;
+            color: white;
+        }
+
+        .dtype-slashing { background: #6c757d; }
+        .dtype-piercing { background: #495057; }
+        .dtype-bludgeoning { background: #343a40; }
+        .dtype-poison { background: #6f42c1; }
+        .dtype-acid { background: #20c997; }
+        .dtype-fire { background: #fd7e14; }
+        .dtype-cold { background: #0dcaf0; }
+        .dtype-radiant { background: #ffc107; }
+        .dtype-necrotic { background: #6610f2; }
+        .dtype-lightning { background: #0d6efd; }
+        .dtype-thunder { background: #6c757d; }
+        .dtype-force { background: #d63384; }
+        .dtype-psychic { background: #e83e8c; }
+
+        .attack-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .minion-item {
+            background: #fff3e0;
+            border: 2px solid #ffb74d;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .result-item {
+            background: white;
+            border-left: 3px solid #28a745;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .result-item.critical-success {
+            border-left-color: #ffc107;
+            background: #fff9e6;
+        }
+
+        .result-item.critical-failure {
+            border-left-color: #dc3545;
+            background: #ffe6e6;
+        }
+
+        .result-header {
+            font-weight: bold;
+            font-size: 13px;
+            color: #2a5298;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-timestamp {
+            font-size: 10px;
+            color: #999;
+            font-weight: normal;
+        }
+
+        .result-detail {
+            margin: 4px 0;
+            font-size: 12px;
+        }
+
+        .damage-breakdown {
+            background: #f8f9fa;
+            padding: 6px;
+            border-radius: 4px;
+            margin: 6px 0;
+        }
+
+        .damage-type-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 4px 0;
+            padding: 4px;
+            background: white;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .damage-total {
+            font-size: 14px;
+            font-weight: bold;
+            color: #dc3545;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .dice-result {
+            display: inline-block;
+            background: #2a5298;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 0 1px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .quick-dice-roller {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .quick-dice-roller h3 {
+            margin-bottom: 6px;
+            color: #2a5298;
+            font-size: 13px;
+        }
+
+        .dice-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .target-item {
+            background: #f5f5f5;
+            border: 2px solid #9e9e9e;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .target-item.bloodied {
+            border-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .target-item.dying {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .target-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .target-name {
+            font-weight: bold;
+            font-size: 13px;
+            color: #2a5298;
+        }
+
+        .target-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .hp-bar-container {
+            grid-column: 1 / -1;
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 16px;
+            overflow: hidden;
+            position: relative;
+            margin: 6px 0;
+        }
+
+        .hp-bar {
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            height: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .hp-bar.bloodied {
+            background: linear-gradient(90deg, #ff9800, #ffc107);
+        }
+
+        .hp-bar.dying {
+            background: linear-gradient(90deg, #f44336, #e57373);
+        }
+
+        .target-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #2a5298;
+            color: white;
+            border: none;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .template-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #2a5298;
+            padding-bottom: 10px;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .template-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .template-item {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-item:hover {
+            background: #e3f2fd;
+            border-color: #2a5298;
+        }
+
+        .conditions-badges {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .condition-badge {
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            background: #9c27b0;
+            color: white;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.1em;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .damage-component {
+                grid-template-columns: 1fr;
+            }
+
+            .batch-controls button {
+                flex: 1;
+                min-width: 100px;
+            }
+
+            .attack-stats {
+                font-size: 10px;
+            }
+
+            .stat-badge {
+                padding: 1px 4px;
+            }
+
+            .floating-action-btn {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span>⚔️ Quick 5e Combat</span>
+            <div style="display: flex; gap: 10px;">
+                <span class="settings-toggle" onclick="toggleDisplayMode()" id="displayModeToggle">🎨 Emoji</span>
+                <span class="settings-toggle" onclick="showKeyboardHelp()" title="Keyboard Shortcuts">⌨️</span>
+                <span class="settings-toggle" onclick="openTemplateModal()" title="Attack Templates">📋</span>
+            </div>
+        </h1>
+
+        <!-- Initiative Tracker -->
+        <div class="card initiative-tracker">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h2 style="margin: 0; border: none; padding: 0;">⚡ Initiative</h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-success btn-small" onclick="rollInitiative()">Roll Init</button>
+                    <button class="btn-primary btn-small" onclick="nextTurn()">Next →</button>
+                    <button class="btn-secondary btn-small" onclick="clearInitiative()">Clear</button>
+                </div>
+            </div>
+            <div class="initiative-list" id="initiativeList">
+                <div class="empty-state" style="margin: 0; padding: 10px;">No initiative rolled</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Character Section -->
+            <div class="card">
+                <h2>Character</h2>
+
+                <div class="character-name-input">
+                    <label for="characterName">Name:</label>
+                    <input type="text" id="characterName" placeholder="Character name" onchange="saveCharacterName()">
+                </div>
+
+                <div class="batch-controls">
+                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('character')" style="flex: 1;" id="charRollBtn">🎲 Roll</button>
+                    <button class="btn-info" onclick="repeatLastRoll()">🔄</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', true)">All</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', false)">None</button>
+                </div>
+
+                <div id="characterAttacks"></div>
+
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addCharacterAttack()">➕ Add Attack</button>
+
+                <div class="quick-dice-roller">
+                    <h3>Quick Roll</h3>
+                    <div class="dice-buttons">
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d4')">d4</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d6')">d6</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d8')">d8</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d10')">d10</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d12')">d12</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d20')">d20</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d100')">d100</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Minions Section -->
+            <div class="card">
+                <h2>Minions</h2>
+
+                <div class="batch-controls">
+                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('minions')" style="flex: 1;" id="minionRollBtn">🎲 Roll</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', true)">All</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', false)">None</button>
+                </div>
+
+                <div id="minions"></div>
+
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addMinion()">➕ Add Group</button>
+            </div>
+
+            <!-- Targets Section -->
+            <div class="card">
+                <h2>🎯 Targets</h2>
+
+                <div id="targets"></div>
+
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addTarget()">➕ Add Target</button>
+            </div>
+
+            <!-- Combat Log -->
+            <div class="card combat-log-card">
+                <div class="log-header">
+                    <h2>Combat Log</h2>
+                    <div class="log-controls">
+                        <button class="btn-warning btn-small" onclick="exportLog()">💾</button>
+                        <button class="btn-danger btn-small" onclick="clearResults()">🗑️</button>
+                    </div>
+                </div>
+                <div class="results-container" id="results">
+                    <div class="empty-state">No rolls yet. Select attacks and click Roll!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div class="template-modal" id="templateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0;">Attack Templates</h2>
+                <span class="modal-close" onclick="closeTemplateModal()">×</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <button class="btn-primary btn-small" onclick="importTemplateJSON()" style="flex: 1;">📥 Import JSON</button>
+                <button class="btn-info btn-small" onclick="exportTemplateJSON()" style="flex: 1;">📤 Export JSON</button>
+            </div>
+            <div class="template-list" id="templateList">
+                <div class="empty-state">No templates saved yet</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button (Mobile) -->
+    <button class="floating-action-btn" onclick="rollSelectedAttacks('character'); rollSelectedAttacks('minions')">
+        🎲
+    </button>
+
+    <script>
+        // ========================================
+        // CONSTANTS
+        // ========================================
+
+        const DAMAGE_TYPES = [
+            'slashing', 'piercing', 'bludgeoning',
+            'poison', 'acid', 'fire', 'cold', 'radiant', 'necrotic',
+            'lightning', 'thunder', 'force', 'psychic'
+        ];
+
+        const DAMAGE_TYPE_EMOJI = {
+            'slashing': '⚔️',
+            'piercing': '🗡️',
+            'bludgeoning': '🔨',
+            'fire': '🔥',
+            'cold': '❄️',
+            'lightning': '⚡',
+            'thunder': '🌩️',
+            'acid': '🧪',
+            'radiant': '✨',
+            'necrotic': '💀',
+            'force': '💫',
+            'poison': '☠️',
+            'psychic': '🧠'
+        };
+
+        const DAMAGE_TYPE_ABBR = {
+            'slashing': 'sla',
+            'piercing': 'pie',
+            'bludgeoning': 'blu',
+            'fire': 'fir',
+            'cold': 'cld',
+            'lightning': 'lit',
+            'thunder': 'thu',
+            'acid': 'acd',
+            'radiant': 'rad',
+            'necrotic': 'nec',
+            'force': 'frc',
+            'poison': 'poi',
+            'psychic': 'psy'
+        };
+
+        const ADVANTAGE_EMOJI = {
+            'advantage': '🎲↑',
+            'disadvantage': '🎲↓',
+            'normal': ''
+        };
+
+        const ADVANTAGE_TEXT = {
+            'advantage': 'ADV',
+            'disadvantage': 'DIS',
+            'normal': ''
+        };
+
+        // ========================================
+        // STATE MANAGEMENT
+        // ========================================
+
+        let characterName = '';
+        let characterAttacks = [];
+        let minions = [];
+        let targets = [];
+        let combatLog = [];
+        let initiative = [];
+        let currentTurn = 0;
+        let attackTemplates = [];
+        let lastRollConfig = null;
+        let lastDamageRoll = null;
+        let selectedTarget = null;
+        let history = [];
+        let historyIndex = -1;
+        let attackIdCounter = 0;
+        let minionIdCounter = 0;
+        let targetIdCounter = 0;
+        let damageComponentIdCounter = 0;
+        let displayMode = 'emoji'; // 'emoji' or 'text'
+
+        // ========================================
+        // DICE ROLLING FUNCTIONS
+        // ========================================
+
+        function rollDie(sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        }
+
+        function rollDice(notation) {
+            const match = notation.match(/(\d+)d(\d+)([+-]\d+)?/i);
+            if (!match) return { rolls: [], total: 0, modifier: 0 };
+
+            const count = parseInt(match[1]);
+            const sides = parseInt(match[2]);
+            const modifier = match[3] ? parseInt(match[3]) : 0;
+
+            const rolls = [];
+            for (let i = 0; i < count; i++) {
+                rolls.push(rollDie(sides));
+            }
+
+            const total = rolls.reduce((sum, roll) => sum + roll, 0) + modifier;
+
+            return { rolls, total, modifier, count, sides };
+        }
+
+        function rollWithAdvantage(modifier) {
+            const roll1 = rollDie(20);
+            const roll2 = rollDie(20);
+            const higher = Math.max(roll1, roll2);
+            return {
+                rolls: [roll1, roll2],
+                selected: higher,
+                total: higher + modifier,
+                natural: higher
+            };
+        }
+
+        function rollWithDisadvantage(modifier) {
+            const roll1 = rollDie(20);
+            const roll2 = rollDie(20);
+            const lower = Math.min(roll1, roll2);
+            return {
+                rolls: [roll1, roll2],
+                selected: lower,
+                total: lower + modifier,
+                natural: lower
+            };
+        }
+
+        function rollNormal(modifier) {
+            const roll = rollDie(20);
+            return {
+                rolls: [roll],
+                selected: roll,
+                total: roll + modifier,
+                natural: roll
+            };
+        }
+
+        // ========================================
+        // UI HELPERS
+        // ========================================
+
+        function toggleExpand(attackId, type = 'character') {
+            const element = document.querySelector(`[data-attack-id="${attackId}"]`);
+            if (element) {
+                element.classList.toggle('expanded');
+            }
+        }
+
+        function toggleDisplayMode() {
+            displayMode = displayMode === 'emoji' ? 'text' : 'emoji';
+            const toggleBtn = document.getElementById('displayModeToggle');
+            toggleBtn.textContent = displayMode === 'emoji' ? '🎨 Emoji' : '🔤 Text';
+            renderCharacterAttacks();
+            renderMinions();
+            saveState();
+        }
+
+        function getDamageTypeDisplay(damageType) {
+            if (displayMode === 'emoji') {
+                return DAMAGE_TYPE_EMOJI[damageType] || damageType;
+            } else {
+                return DAMAGE_TYPE_ABBR[damageType] || damageType.substring(0,3);
+            }
+        }
+
+        function getAdvantageDisplay(advantage) {
+            if (displayMode === 'emoji') {
+                return ADVANTAGE_EMOJI[advantage] || '';
+            } else {
+                return ADVANTAGE_TEXT[advantage] || '';
+            }
+        }
+
+        function getDamageSummary(damageComponents) {
+            return damageComponents.map(c => {
+                const bonus = c.bonus !== 0 ? (c.bonus > 0 ? `+${c.bonus}` : c.bonus) : '';
+                const typeDisplay = getDamageTypeDisplay(c.damageType);
+                return `${c.dice}${bonus} ${typeDisplay}`;
+            }).join(' + ');
+        }
+
+        function updateRollButtonCounts() {
+            const charCount = characterAttacks.filter(a => a.selected).length;
+            const minionCount = minions.reduce((count, m) => count + m.attacks.filter(a => a.selected).length, 0);
+
+            const charBtn = document.getElementById('charRollBtn');
+            const minionBtn = document.getElementById('minionRollBtn');
+
+            if (charBtn) {
+                charBtn.textContent = charCount > 0 ? `🎲 Roll (${charCount})` : '🎲 Roll';
+            }
+            if (minionBtn) {
+                minionBtn.textContent = minionCount > 0 ? `🎲 Roll (${minionCount})` : '🎲 Roll';
+            }
+        }
+
+        // ========================================
+        // DAMAGE COMPONENT FUNCTIONS
+        // ========================================
+
+        function addDamageComponent(attackId, type = 'character', minionId = null) {
+            const component = {
+                id: damageComponentIdCounter++,
+                dice: '1d8',
+                bonus: 0,
+                damageType: 'slashing'
+            };
+
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.damageComponents.push(component);
+                    renderCharacterAttacks();
+                }
+            } else {
+                const minion = minions.find(m => m.id === minionId);
+                if (minion) {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        attack.damageComponents.push(component);
+                        renderMinions();
+                    }
+                }
+            }
+            saveState();
+        }
+
+        function removeDamageComponent(attackId, componentId, type = 'character', minionId = null) {
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.damageComponents = attack.damageComponents.filter(c => c.id !== componentId);
+                    renderCharacterAttacks();
+                }
+            } else {
+                const minion = minions.find(m => m.id === minionId);
+                if (minion) {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        attack.damageComponents = attack.damageComponents.filter(c => c.id !== componentId);
+                        renderMinions();
+                    }
+                }
+            }
+            saveState();
+        }
+
+        function updateDamageComponent(attackId, componentId, field, value, type = 'character', minionId = null) {
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    const component = attack.damageComponents.find(c => c.id === componentId);
+                    if (component) {
+                        component[field] = value;
+                        renderCharacterAttacks();
+                        saveState();
+                    }
+                }
+            } else {
+                const minion = minions.find(m => m.id === minionId);
+                if (minion) {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        const component = attack.damageComponents.find(c => c.id === componentId);
+                        if (component) {
+                            component[field] = value;
+                            renderMinions();
+                            saveState();
+                        }
+                    }
+                }
+            }
+        }
+
+        function renderDamageComponents(attack, attackType = 'character', minionId = null) {
+            return `
+                <div class="damage-components">
+                    <h4>
+                        <span>Damage</span>
+                        <button class="btn-primary btn-small" onclick="addDamageComponent(${attack.id}, '${attackType}', ${minionId})">+ Add</button>
+                    </h4>
+                    ${attack.damageComponents.map(comp => `
+                        <div class="damage-component">
+                            <input type="text"
+                                   value="${comp.dice}"
+                                   placeholder="2d6"
+                                   onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'dice', this.value, '${attackType}', ${minionId})">
+                            <input type="number"
+                                   value="${comp.bonus}"
+                                   placeholder="+0"
+                                   onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'bonus', parseInt(this.value), '${attackType}', ${minionId})">
+                            <select onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'damageType', this.value, '${attackType}', ${minionId})">
+                                ${DAMAGE_TYPES.map(dt => `<option value="${dt}" ${comp.damageType === dt ? 'selected' : ''}>${dt.charAt(0).toUpperCase() + dt.slice(1)}</option>`).join('')}
+                            </select>
+                            <button class="btn-danger btn-small" onclick="removeDamageComponent(${attack.id}, ${comp.id}, '${attackType}', ${minionId})">×</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // ========================================
+        // CHARACTER ATTACK FUNCTIONS
+        // ========================================
+
+        function addCharacterAttack() {
+            const attack = {
+                id: attackIdCounter++,
+                name: 'New Attack',
+                attackBonus: 0,
+                damageComponents: [{
+                    id: damageComponentIdCounter++,
+                    dice: '1d8',
+                    bonus: 0,
+                    damageType: 'slashing'
+                }],
+                saveDC: 0,
+                saveType: 'DEX',
+                advantage: 'normal',
+                rollCount: 1,
+                selected: false,
+                expanded: true
+            };
+            characterAttacks.push(attack);
+            renderCharacterAttacks();
+            saveState();
+        }
+
+        function removeCharacterAttack(id) {
+            characterAttacks = characterAttacks.filter(a => a.id !== id);
+            renderCharacterAttacks();
+            saveState();
+        }
+
+        function duplicateCharacterAttack(id) {
+            const attack = characterAttacks.find(a => a.id === id);
+            if (attack) {
+                const newAttack = {
+                    ...attack,
+                    id: attackIdCounter++,
+                    name: `${attack.name} (Copy)`,
+                    selected: false,
+                    expanded: false,
+                    damageComponents: attack.damageComponents.map(c => ({
+                        ...c,
+                        id: damageComponentIdCounter++
+                    }))
+                };
+                characterAttacks.push(newAttack);
+                renderCharacterAttacks();
+                saveState();
+            }
+        }
+
+        function updateCharacterAttack(id, field, value) {
+            const attack = characterAttacks.find(a => a.id === id);
+            if (attack) {
+                attack[field] = value;
+                if (field === 'selected') {
+                    renderCharacterAttacks();
+                } else if (['name', 'attackBonus', 'damageComponents'].includes(field)) {
+                    renderCharacterAttacks();
+                }
+                saveState();
+            }
+        }
+
+        function toggleAttackSelection(id, type = 'character') {
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === id);
+                if (attack) {
+                    attack.selected = !attack.selected;
+                    renderCharacterAttacks();
+                    saveState();
+                }
+            }
+        }
+
+        function selectAllAttacks(type, select) {
+            if (type === 'character') {
+                characterAttacks.forEach(a => a.selected = select);
+                renderCharacterAttacks();
+            } else if (type === 'minions') {
+                minions.forEach(m => m.attacks.forEach(a => a.selected = select));
+                renderMinions();
+            }
+            saveState();
+        }
+
+        function renderCharacterAttacks() {
+            const container = document.getElementById('characterAttacks');
+            if (characterAttacks.length === 0) {
+                container.innerHTML = '<p class="empty-state">No attacks yet</p>';
+                return;
+            }
+
+            container.innerHTML = characterAttacks.map(attack => {
+                const damageSummary = getDamageSummary(attack.damageComponents);
+                const advDisplay = getAdvantageDisplay(attack.advantage);
+                const countDisplay = attack.rollCount && attack.rollCount > 1 ? `×${attack.rollCount}` : '';
+                return `
+                <div class="attack-item ${attack.selected ? 'selected' : ''} ${attack.expanded ? 'expanded' : ''}" data-attack-id="${attack.id}">
+                    <div class="attack-compact" onclick="toggleExpand(${attack.id}, 'character')">
+                        <input type="checkbox"
+                               class="attack-checkbox"
+                               ${attack.selected ? 'checked' : ''}
+                               onclick="event.stopPropagation(); toggleAttackSelection(${attack.id}, 'character')">
+                        <div class="attack-info">
+                            <div class="attack-name">${attack.name}${countDisplay ? ` <span style="color: #ff9800; font-weight: bold;">${countDisplay}</span>` : ''}</div>
+                            <div class="attack-stats">
+                                <span class="stat-badge stat-hit">+${attack.attackBonus}</span>
+                                <span class="stat-badge stat-dmg">${damageSummary}</span>
+                                ${advDisplay ? `<span class="stat-badge" style="background: #fff3cd; color: #856404;">${advDisplay}</span>` : ''}
+                                ${attack.saveDC > 0 ? `<span class="stat-badge stat-save">DC${attack.saveDC} ${attack.saveType}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="expand-icon">▼</div>
+                    </div>
+                    <div class="attack-details">
+                        <input type="text"
+                               value="${attack.name}"
+                               placeholder="Attack Name"
+                               style="margin-bottom: 8px; font-weight: bold;"
+                               onchange="updateCharacterAttack(${attack.id}, 'name', this.value)"
+                               onclick="event.stopPropagation()">
+
+                        <div class="attack-grid">
+                            <div class="form-group">
+                                <label>To Hit</label>
+                                <input type="number"
+                                       value="${attack.attackBonus}"
+                                       onchange="updateCharacterAttack(${attack.id}, 'attackBonus', parseInt(this.value))"
+                                       onclick="event.stopPropagation()">
+                            </div>
+                            <div class="form-group">
+                                <label>× Count</label>
+                                <input type="number"
+                                       value="${attack.rollCount || 1}"
+                                       min="1"
+                                       max="10"
+                                       onchange="updateCharacterAttack(${attack.id}, 'rollCount', parseInt(this.value) || 1)"
+                                       onclick="event.stopPropagation()">
+                            </div>
+                            <div class="form-group">
+                                <label>Save DC</label>
+                                <input type="number"
+                                       value="${attack.saveDC}"
+                                       onchange="updateCharacterAttack(${attack.id}, 'saveDC', parseInt(this.value))"
+                                       onclick="event.stopPropagation()">
+                            </div>
+                            <div class="form-group">
+                                <label>Save Type</label>
+                                <select onchange="updateCharacterAttack(${attack.id}, 'saveType', this.value)" onclick="event.stopPropagation()">
+                                    <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
+                                    <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
+                                    <option value="CON" ${attack.saveType === 'CON' ? 'selected' : ''}>CON</option>
+                                    <option value="INT" ${attack.saveType === 'INT' ? 'selected' : ''}>INT</option>
+                                    <option value="WIS" ${attack.saveType === 'WIS' ? 'selected' : ''}>WIS</option>
+                                    <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        ${renderDamageComponents(attack, 'character', null)}
+
+                        <div class="advantage-selector" onclick="event.stopPropagation()">
+                            <label>
+                                <input type="radio" name="adv-${attack.id}" value="normal"
+                                       ${attack.advantage === 'normal' ? 'checked' : ''}
+                                       onchange="updateCharacterAttack(${attack.id}, 'advantage', 'normal')">
+                                Normal
+                            </label>
+                            <label>
+                                <input type="radio" name="adv-${attack.id}" value="advantage"
+                                       ${attack.advantage === 'advantage' ? 'checked' : ''}
+                                       onchange="updateCharacterAttack(${attack.id}, 'advantage', 'advantage')">
+                                Adv
+                            </label>
+                            <label>
+                                <input type="radio" name="adv-${attack.id}" value="disadvantage"
+                                       ${attack.advantage === 'disadvantage' ? 'checked' : ''}
+                                       onchange="updateCharacterAttack(${attack.id}, 'advantage', 'disadvantage')">
+                                Dis
+                            </label>
+                        </div>
+
+                        <div class="attack-actions" onclick="event.stopPropagation()">
+                            <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'character')">🎲 Roll</button>
+                            <button class="btn-info btn-small" onclick="duplicateCharacterAttack(${attack.id})">📋 Dup</button>
+                            <button class="btn-secondary btn-small" onclick="saveAttackAsTemplate(characterAttacks.find(a => a.id === ${attack.id}), 'character')">💾 Save</button>
+                            <button class="btn-danger btn-small" onclick="removeCharacterAttack(${attack.id})">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+            updateRollButtonCounts();
+        }
+
+        // ========================================
+        // MINION FUNCTIONS
+        // ========================================
+
+        function addMinion() {
+            const minion = {
+                id: minionIdCounter++,
+                name: 'Minion Group',
+                attacks: []
+            };
+            minions.push(minion);
+            renderMinions();
+            saveState();
+        }
+
+        function removeMinion(id) {
+            minions = minions.filter(m => m.id !== id);
+            renderMinions();
+            saveState();
+        }
+
+        function updateMinion(id, field, value) {
+            const minion = minions.find(m => m.id === id);
+            if (minion) {
+                minion[field] = value;
+                saveState();
+            }
+        }
+
+        function addMinionAttack(minionId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                // Prompt for how many to add
+                const countStr = prompt('How many minions to add?', '1');
+                if (countStr === null) return; // User cancelled
+
+                const count = parseInt(countStr);
+                if (isNaN(count) || count < 1 || count > 50) {
+                    alert('Please enter a number between 1 and 50');
+                    return;
+                }
+
+                // Add the specified number of attacks
+                for (let i = 0; i < count; i++) {
+                    const nextNumber = minion.attacks.length + 1;
+                    const attack = {
+                        id: attackIdCounter++,
+                        minionIdentifier: `#${nextNumber}`,
+                        name: 'Attack',
+                        attackBonus: 0,
+                        damageComponents: [{
+                            id: damageComponentIdCounter++,
+                            dice: '1d8',
+                            bonus: 0,
+                            damageType: 'slashing'
+                        }],
+                        saveDC: 0,
+                        saveType: 'DEX',
+                        advantage: 'normal',
+                        rollCount: 1,
+                        selected: false,
+                        expanded: i === 0 // Only expand the first one
+                    };
+                    minion.attacks.push(attack);
+                }
+                renderMinions();
+                saveState();
+            }
+        }
+
+        function removeMinionAttack(minionId, attackId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                minion.attacks = minion.attacks.filter(a => a.id !== attackId);
+                renderMinions();
+                saveState();
+            }
+        }
+
+        function duplicateMinionAttack(minionId, attackId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack) {
+                    const nextNumber = minion.attacks.length + 1;
+                    const newAttack = {
+                        ...attack,
+                        id: attackIdCounter++,
+                        minionIdentifier: `#${nextNumber}`,
+                        selected: false,
+                        expanded: false,
+                        damageComponents: attack.damageComponents.map(c => ({
+                            ...c,
+                            id: damageComponentIdCounter++
+                        }))
+                    };
+                    minion.attacks.push(newAttack);
+                    renderMinions();
+                    saveState();
+                }
+            }
+        }
+
+        function updateMinionAttack(minionId, attackId, field, value) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack[field] = value;
+                    if (field === 'selected') {
+                        renderMinions();
+                    } else if (['name', 'minionIdentifier', 'attackBonus', 'damageComponents'].includes(field)) {
+                        renderMinions();
+                    }
+                    saveState();
+                }
+            }
+        }
+
+        function applyToAllInGroup(minionId, sourceAttackId) {
+            if (!confirm('Apply this attack\'s stats to ALL attacks in this group?\n(Name, attack bonus, damage, save DC, advantage)\n\nIndividual identifiers (#1, #2, etc.) will be preserved.')) {
+                return;
+            }
+
+            const minion = minions.find(m => m.id === minionId);
+            if (!minion) return;
+
+            const sourceAttack = minion.attacks.find(a => a.id === sourceAttackId);
+            if (!sourceAttack) return;
+
+            minion.attacks.forEach(attack => {
+                if (attack.id !== sourceAttackId) {
+                    // Copy stats but preserve identifier and ID
+                    const preservedId = attack.minionIdentifier;
+                    const preservedAttackId = attack.id;
+                    const preservedSelected = attack.selected;
+                    const preservedExpanded = attack.expanded;
+
+                    Object.assign(attack, JSON.parse(JSON.stringify(sourceAttack)));
+
+                    attack.id = preservedAttackId;
+                    attack.minionIdentifier = preservedId;
+                    attack.selected = preservedSelected;
+                    attack.expanded = preservedExpanded;
+
+                    // Regenerate damage component IDs
+                    attack.damageComponents = attack.damageComponents.map(c => ({
+                        ...c,
+                        id: damageComponentIdCounter++
+                    }));
+                }
+            });
+
+            renderMinions();
+            saveState();
+            alert(`Applied to ${minion.attacks.length} attacks in group!`);
+        }
+
+        function toggleMinionAttackSelection(minionId, attackId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.selected = !attack.selected;
+                    renderMinions();
+                    saveState();
+                }
+            }
+        }
+
+        function renderMinions() {
+            const container = document.getElementById('minions');
+            if (minions.length === 0) {
+                container.innerHTML = '<p class="empty-state">No minion groups yet</p>';
+                return;
+            }
+
+            container.innerHTML = minions.map(minion => `
+                <div class="minion-item">
+                    <input type="text"
+                           value="${minion.name}"
+                           placeholder="Group Name"
+                           style="margin-bottom: 8px; font-weight: bold;"
+                           onchange="updateMinion(${minion.id}, 'name', this.value)">
+
+                    ${minion.attacks.map(attack => {
+                        const damageSummary = getDamageSummary(attack.damageComponents);
+                        const advDisplay = getAdvantageDisplay(attack.advantage);
+                        const countDisplay = attack.rollCount && attack.rollCount > 1 ? `×${attack.rollCount}` : '';
+                        return `
+                        <div class="attack-item ${attack.selected ? 'selected' : ''} ${attack.expanded ? 'expanded' : ''}" data-attack-id="${attack.id}" style="background: white;">
+                            <div class="attack-compact" onclick="toggleExpand(${attack.id}, 'minion')">
+                                <input type="checkbox"
+                                       class="attack-checkbox"
+                                       ${attack.selected ? 'checked' : ''}
+                                       onclick="event.stopPropagation(); toggleMinionAttackSelection(${minion.id}, ${attack.id})">
+                                <div class="attack-info">
+                                    <div class="attack-name">${attack.minionIdentifier} ${attack.name}${countDisplay ? ` <span style="color: #ff9800; font-weight: bold;">${countDisplay}</span>` : ''}</div>
+                                    <div class="attack-stats">
+                                        <span class="stat-badge stat-hit">+${attack.attackBonus}</span>
+                                        <span class="stat-badge stat-dmg">${damageSummary}</span>
+                                        ${advDisplay ? `<span class="stat-badge" style="background: #fff3cd; color: #856404;">${advDisplay}</span>` : ''}
+                                        ${attack.saveDC > 0 ? `<span class="stat-badge stat-save">DC${attack.saveDC} ${attack.saveType}</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="expand-icon">▼</div>
+                            </div>
+                            <div class="attack-details">
+                                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                                    <input type="text"
+                                           value="${attack.minionIdentifier || ''}"
+                                           placeholder="#1"
+                                           style="width: 60px; font-weight: bold;"
+                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'minionIdentifier', this.value)"
+                                           onclick="event.stopPropagation()">
+                                    <input type="text"
+                                           value="${attack.name}"
+                                           placeholder="Attack"
+                                           style="flex: 1; font-weight: bold;"
+                                           onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'name', this.value)"
+                                           onclick="event.stopPropagation()">
+                                </div>
+
+                                <div class="attack-grid">
+                                    <div class="form-group">
+                                        <label>To Hit</label>
+                                        <input type="number"
+                                               value="${attack.attackBonus}"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'attackBonus', parseInt(this.value))"
+                                               onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>× Count</label>
+                                        <input type="number"
+                                               value="${attack.rollCount || 1}"
+                                               min="1"
+                                               max="10"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'rollCount', parseInt(this.value) || 1)"
+                                               onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Save DC</label>
+                                        <input type="number"
+                                               value="${attack.saveDC}"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveDC', parseInt(this.value))"
+                                               onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Save</label>
+                                        <select onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveType', this.value)" onclick="event.stopPropagation()">
+                                            <option value="STR" ${attack.saveType === 'STR' ? 'selected' : ''}>STR</option>
+                                            <option value="DEX" ${attack.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
+                                            <option value="CON" ${attack.saveType === 'CON' ? 'selected' : ''}>CON</option>
+                                            <option value="INT" ${attack.saveType === 'INT' ? 'selected' : ''}>INT</option>
+                                            <option value="WIS" ${attack.saveType === 'WIS' ? 'selected' : ''}>WIS</option>
+                                            <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                ${renderDamageComponents(attack, 'minion', minion.id)}
+
+                                <div class="advantage-selector" onclick="event.stopPropagation()">
+                                    <label>
+                                        <input type="radio" name="adv-${minion.id}-${attack.id}" value="normal"
+                                               ${attack.advantage === 'normal' ? 'checked' : ''}
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'normal')">
+                                        Normal
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="adv-${minion.id}-${attack.id}" value="advantage"
+                                               ${attack.advantage === 'advantage' ? 'checked' : ''}
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'advantage')">
+                                        Adv
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="adv-${minion.id}-${attack.id}" value="disadvantage"
+                                               ${attack.advantage === 'disadvantage' ? 'checked' : ''}
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'disadvantage')">
+                                        Dis
+                                    </label>
+                                </div>
+
+                                <div class="attack-actions" onclick="event.stopPropagation()">
+                                    <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'minion', ${minion.id})">🎲 Roll</button>
+                                    <button class="btn-info btn-small" onclick="duplicateMinionAttack(${minion.id}, ${attack.id})">📋 Dup</button>
+                                    <button class="btn-secondary btn-small" onclick="saveAttackAsTemplate(minions.find(m => m.id === ${minion.id}).attacks.find(a => a.id === ${attack.id}), 'minion')">💾 Save</button>
+                                    ${minion.attacks.length > 1 ? `<button class="btn-warning btn-small" onclick="applyToAllInGroup(${minion.id}, ${attack.id})">↓ Apply to All</button>` : ''}
+                                    <button class="btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    `}).join('')}
+
+                    <div style="margin-top: 8px; display: flex; gap: 6px;">
+                        <button class="btn-primary btn-small" style="flex: 1;" onclick="addMinionAttack(${minion.id})">+ Attack</button>
+                        <button class="btn-danger btn-small" onclick="removeMinion(${minion.id})">Remove Group</button>
+                    </div>
+                </div>
+            `).join('');
+            updateRollButtonCounts();
+        }
+
+        // ========================================
+        // TARGET MANAGEMENT FUNCTIONS
+        // ========================================
+
+        function addTarget() {
+            const target = {
+                id: targetIdCounter++,
+                name: 'Target',
+                currentHP: 20,
+                maxHP: 20,
+                ac: 15,
+                initiative: 10,
+                resistances: [],
+                vulnerabilities: [],
+                immunities: [],
+                conditions: []
+            };
+            targets.push(target);
+            renderTargets();
+            saveState();
+        }
+
+        function removeTarget(id) {
+            targets = targets.filter(t => t.id !== id);
+            if (selectedTarget === id) selectedTarget = null;
+            renderTargets();
+            saveState();
+        }
+
+        function updateTarget(id, field, value) {
+            const target = targets.find(t => t.id === id);
+            if (target) {
+                target[field] = value;
+                renderTargets();
+                saveState();
+            }
+        }
+
+        function applyDamage(targetId, amount, damageType = 'normal') {
+            const target = targets.find(t => t.id === targetId);
+            if (!target) return;
+
+            let finalDamage = amount;
+
+            // Apply resistance/vulnerability/immunity
+            if (target.immunities.includes(damageType)) {
+                finalDamage = 0;
+            } else if (target.resistances.includes(damageType)) {
+                finalDamage = Math.floor(amount / 2);
+            } else if (target.vulnerabilities.includes(damageType)) {
+                finalDamage = amount * 2;
+            }
+
+            target.currentHP = Math.max(0, target.currentHP - finalDamage);
+            renderTargets();
+            saveState();
+
+            // Log the damage
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = {
+                timestamp,
+                targetName: target.name,
+                damage: finalDamage,
+                damageType,
+                newHP: target.currentHP
+            };
+            addToLog(`[${timestamp}] ${target.name} takes ${finalDamage} ${damageType} damage → ${target.currentHP}/${target.maxHP} HP`);
+        }
+
+        function healTarget(targetId, amount) {
+            const target = targets.find(t => t.id === targetId);
+            if (!target) return;
+
+            target.currentHP = Math.min(target.maxHP, target.currentHP + amount);
+            renderTargets();
+            saveState();
+
+            const timestamp = new Date().toLocaleTimeString();
+            addToLog(`[${timestamp}] ${target.name} heals ${amount} HP → ${target.currentHP}/${target.maxHP} HP`);
+        }
+
+        function selectTargetForDamage(targetId) {
+            selectedTarget = targetId;
+            renderTargets();
+        }
+
+        function renderTargets() {
+            const container = document.getElementById('targets');
+            if (targets.length === 0) {
+                container.innerHTML = '<p class="empty-state">No targets yet</p>';
+                return;
+            }
+
+            container.innerHTML = targets.map(target => {
+                const hpPercent = (target.currentHP / target.maxHP) * 100;
+                let hpClass = '';
+                let targetClass = '';
+                if (hpPercent <= 0) {
+                    hpClass = 'dying';
+                    targetClass = 'dying';
+                } else if (hpPercent <= 50) {
+                    hpClass = 'bloodied';
+                    targetClass = 'bloodied';
+                }
+
+                const isSelected = selectedTarget === target.id;
+
+                return `
+                    <div class="target-item ${targetClass} ${isSelected ? 'selected' : ''}" data-target-id="${target.id}">
+                        <div class="target-header">
+                            <input type="text"
+                                   value="${target.name}"
+                                   style="font-weight: bold; font-size: 13px; border: none; background: transparent; width: 100%;"
+                                   onchange="updateTarget(${target.id}, 'name', this.value)">
+                            <button class="btn-danger btn-small" onclick="removeTarget(${target.id})">×</button>
+                        </div>
+
+                        <div class="hp-bar-container">
+                            <div class="hp-bar ${hpClass}" style="width: ${hpPercent}%">
+                                ${target.currentHP}/${target.maxHP}
+                            </div>
+                        </div>
+
+                        <div class="target-stats">
+                            <div>
+                                <strong>AC:</strong>
+                                <input type="number" value="${target.ac}" style="width: 50px;" onchange="updateTarget(${target.id}, 'ac', parseInt(this.value))">
+                            </div>
+                            <div>
+                                <strong>Init:</strong>
+                                <input type="number" value="${target.initiative}" style="width: 50px;" onchange="updateTarget(${target.id}, 'initiative', parseInt(this.value))">
+                            </div>
+                            <div>
+                                <strong>Current HP:</strong>
+                                <input type="number" value="${target.currentHP}" style="width: 50px;" onchange="updateTarget(${target.id}, 'currentHP', parseInt(this.value))">
+                            </div>
+                            <div>
+                                <strong>Max HP:</strong>
+                                <input type="number" value="${target.maxHP}" style="width: 50px;" onchange="updateTarget(${target.id}, 'maxHP', parseInt(this.value))">
+                            </div>
+                        </div>
+
+                        <div class="target-actions">
+                            <button class="btn-danger btn-small" onclick="applyDamagePrompt(${target.id})">💥 Damage</button>
+                            <button class="btn-success btn-small" onclick="healPrompt(${target.id})">💚 Heal</button>
+                            <button class="btn-info btn-small" onclick="selectTargetForDamage(${target.id})">${isSelected ? '✓ Selected' : 'Select'}</button>
+                        </div>
+
+                        ${target.conditions.length > 0 ? `
+                            <div class="conditions-badges">
+                                ${target.conditions.map(c => `<span class="condition-badge">${c}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function applyDamagePrompt(targetId) {
+            const amount = prompt('Damage amount:', lastDamageRoll ? lastDamageRoll.toString() : '10');
+            if (amount === null || isNaN(amount)) return;
+            applyDamage(targetId, parseInt(amount), 'normal');
+        }
+
+        function healPrompt(targetId) {
+            const amount = prompt('Heal amount:', '10');
+            if (amount === null || isNaN(amount)) return;
+            healTarget(targetId, parseInt(amount));
+        }
+
+        function addToLog(message) {
+            const resultsContainer = document.getElementById('results');
+            const html = `
+                <div class="result-item">
+                    <div class="result-detail">${message}</div>
+                </div>
+            `;
+            resultsContainer.insertAdjacentHTML('afterbegin', html);
+        }
+
+        // ========================================
+        // INITIATIVE TRACKER FUNCTIONS
+        // ========================================
+
+        function rollInitiative() {
+            initiative = [];
+
+            // Add character
+            if (characterName) {
+                const roll = rollDie(20);
+                initiative.push({
+                    name: characterName || 'Character',
+                    initiative: roll,
+                    type: 'character'
+                });
+            }
+
+            // Add minions
+            minions.forEach(minion => {
+                minion.attacks.forEach(attack => {
+                    const roll = rollDie(20);
+                    const name = attack.minionIdentifier ? `${minion.name} ${attack.minionIdentifier}` : minion.name;
+                    initiative.push({
+                        name,
+                        initiative: roll,
+                        type: 'minion'
+                    });
+                });
+            });
+
+            // Add targets
+            targets.forEach(target => {
+                initiative.push({
+                    name: target.name,
+                    initiative: target.initiative + rollDie(20),
+                    type: 'target',
+                    targetId: target.id
+                });
+            });
+
+            // Sort by initiative (highest first)
+            initiative.sort((a, b) => b.initiative - a.initiative);
+            currentTurn = 0;
+            renderInitiative();
+            saveState();
+        }
+
+        function nextTurn() {
+            if (initiative.length === 0) return;
+            currentTurn = (currentTurn + 1) % initiative.length;
+            renderInitiative();
+            saveState();
+        }
+
+        function clearInitiative() {
+            initiative = [];
+            currentTurn = 0;
+            renderInitiative();
+            saveState();
+        }
+
+        function renderInitiative() {
+            const container = document.getElementById('initiativeList');
+            if (initiative.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="margin: 0; padding: 10px;">No initiative rolled</div>';
+                return;
+            }
+
+            container.innerHTML = initiative.map((entry, index) => {
+                const isActive = index === currentTurn;
+                return `
+                    <div class="initiative-item ${isActive ? 'active' : ''}" onclick="currentTurn = ${index}; renderInitiative();">
+                        <span class="init-value">${entry.initiative}</span>
+                        <span>${entry.name}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ========================================
+        // TEMPLATE FUNCTIONS
+        // ========================================
+
+        function openTemplateModal() {
+            document.getElementById('templateModal').style.display = 'flex';
+            renderTemplates();
+        }
+
+        function closeTemplateModal() {
+            document.getElementById('templateModal').style.display = 'none';
+        }
+
+        function saveAttackAsTemplate(attack, type) {
+            const name = prompt('Template name:', attack.name);
+            if (!name) return;
+
+            const template = {
+                name,
+                attack: JSON.parse(JSON.stringify(attack)), // Deep clone
+                type
+            };
+
+            attackTemplates.push(template);
+            saveState();
+            alert(`Template "${name}" saved!`);
+        }
+
+        function loadTemplate(templateIndex) {
+            const template = attackTemplates[templateIndex];
+            if (!template) return;
+
+            const attack = JSON.parse(JSON.stringify(template.attack)); // Deep clone
+            attack.id = attackIdCounter++;
+            attack.selected = false;
+            attack.expanded = true;
+            attack.damageComponents = attack.damageComponents.map(c => ({
+                ...c,
+                id: damageComponentIdCounter++
+            }));
+
+            if (template.type === 'character') {
+                characterAttacks.push(attack);
+                renderCharacterAttacks();
+            } else {
+                // Add to first minion group or create one
+                if (minions.length === 0) {
+                    addMinion();
+                }
+                attack.minionIdentifier = `#${minions[0].attacks.length + 1}`;
+                minions[0].attacks.push(attack);
+                renderMinions();
+            }
+
+            saveState();
+            closeTemplateModal();
+        }
+
+        function deleteTemplate(index) {
+            if (!confirm('Delete this template?')) return;
+            attackTemplates.splice(index, 1);
+            saveState();
+            renderTemplates();
+        }
+
+        function renderTemplates() {
+            const container = document.getElementById('templateList');
+            if (attackTemplates.length === 0) {
+                container.innerHTML = '<div class="empty-state">No templates saved yet</div>';
+                return;
+            }
+
+            container.innerHTML = attackTemplates.map((template, index) => {
+                const attack = template.attack;
+                const damageSummary = getDamageSummary(attack.damageComponents);
+                return `
+                    <div class="template-item" onclick="loadTemplate(${index})">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong>${template.name}</strong>
+                            <button class="btn-danger btn-small" onclick="event.stopPropagation(); deleteTemplate(${index})">×</button>
+                        </div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                            +${attack.attackBonus} • ${damageSummary}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function exportTemplateJSON() {
+            if (attackTemplates.length === 0) {
+                alert('No templates to export!');
+                return;
+            }
+
+            const json = JSON.stringify(attackTemplates, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `attack-templates-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importTemplateJSON() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        if (!Array.isArray(imported)) {
+                            alert('Invalid template file format!');
+                            return;
+                        }
+
+                        attackTemplates = attackTemplates.concat(imported);
+                        saveState();
+                        renderTemplates();
+                        alert(`Imported ${imported.length} templates!`);
+                    } catch (error) {
+                        alert('Error reading template file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // ========================================
+        // ATTACK ROLLING FUNCTIONS
+        // ========================================
+
+        function rollSingleAttack(attackId, type, minionId = null) {
+            let attack, attackerName;
+
+            if (type === 'character') {
+                attack = characterAttacks.find(a => a.id === attackId);
+                attackerName = characterName || 'Character';
+            } else {
+                const minion = minions.find(m => m.id === minionId);
+                attack = minion ? minion.attacks.find(a => a.id === attackId) : null;
+                if (attack && attack.minionIdentifier) {
+                    attackerName = minion ? `${minion.name} ${attack.minionIdentifier}` : 'Minion';
+                } else {
+                    attackerName = minion ? minion.name : 'Minion';
+                }
+            }
+
+            if (!attack) return;
+
+            // Roll multiple times if rollCount > 1
+            const count = attack.rollCount || 1;
+            for (let i = 0; i < count; i++) {
+                const result = executeAttackRoll(attack, attackerName);
+                if (count > 1) {
+                    result.attackName = `${attack.name} #${i + 1}`;
+                }
+                addResult(result);
+            }
+        }
+
+        function rollSelectedAttacks(type) {
+            const selectedAttacks = [];
+
+            if (type === 'character') {
+                characterAttacks.forEach(attack => {
+                    if (attack.selected) {
+                        selectedAttacks.push({
+                            attack,
+                            attackerName: characterName || 'Character'
+                        });
+                    }
+                });
+            } else if (type === 'minions') {
+                minions.forEach(minion => {
+                    minion.attacks.forEach(attack => {
+                        if (attack.selected) {
+                            const attackerName = attack.minionIdentifier
+                                ? `${minion.name} ${attack.minionIdentifier}`
+                                : minion.name;
+                            selectedAttacks.push({
+                                attack,
+                                attackerName: attackerName
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (selectedAttacks.length === 0) {
+                alert('No attacks selected!');
+                return;
+            }
+
+            lastRollConfig = { type, selectedAttacks: selectedAttacks.map(sa => ({
+                attackId: sa.attack.id,
+                attackerName: sa.attackerName,
+                attackType: type === 'character' ? 'character' : 'minion'
+            }))};
+
+            selectedAttacks.forEach(({ attack, attackerName }) => {
+                const result = executeAttackRoll(attack, attackerName);
+                addResult(result);
+            });
+
+            saveState();
+        }
+
+        function executeAttackRoll(attack, attackerName) {
+            let attackRoll;
+            const advantageText = attack.advantage === 'advantage' ? ' (Adv)' :
+                                 attack.advantage === 'disadvantage' ? ' (Dis)' : '';
+
+            if (attack.advantage === 'advantage') {
+                attackRoll = rollWithAdvantage(attack.attackBonus);
+            } else if (attack.advantage === 'disadvantage') {
+                attackRoll = rollWithDisadvantage(attack.attackBonus);
+            } else {
+                attackRoll = rollNormal(attack.attackBonus);
+            }
+
+            const damageRoll = rollDice(attack.damage || '');
+            const isCrit = attackRoll.natural === 20;
+            const isFumble = attackRoll.natural === 1;
+
+            // Roll damage for each component
+            const damageResults = attack.damageComponents.map(comp => {
+                const diceRoll = rollDice(comp.dice);
+                let total = diceRoll.total + comp.bonus;
+
+                if (isCrit) {
+                    total = total * 2;
+                }
+
+                return {
+                    damageType: comp.damageType,
+                    dice: comp.dice,
+                    bonus: comp.bonus,
+                    rolls: diceRoll.rolls,
+                    total: total,
+                    isCrit: isCrit
+                };
+            });
+
+            const totalDamage = damageResults.reduce((sum, dr) => sum + dr.total, 0);
+
+            // Track last damage for quick application
+            lastDamageRoll = totalDamage;
+
+            // Check against selected target
+            let hitStatus = null;
+            let targetAC = null;
+            if (selectedTarget) {
+                const target = targets.find(t => t.id === selectedTarget);
+                if (target) {
+                    targetAC = target.ac;
+                    if (isCrit) {
+                        hitStatus = 'CRITICAL HIT';
+                    } else if (isFumble) {
+                        hitStatus = 'MISS';
+                    } else if (attackRoll.total >= target.ac) {
+                        hitStatus = 'HIT';
+                    } else {
+                        hitStatus = 'MISS';
+                    }
+                }
+            }
+
+            const timestamp = new Date().toLocaleTimeString();
+
+            return {
+                timestamp,
+                attackerName,
+                attackName: attack.name,
+                advantageText,
+                attackRoll,
+                damageResults,
+                totalDamage,
+                isCrit,
+                isFumble,
+                saveDC: attack.saveDC,
+                saveType: attack.saveType,
+                hitStatus,
+                targetAC
+            };
+        }
+
+        function repeatLastRoll() {
+            if (!lastRollConfig) {
+                alert('No previous roll!');
+                return;
+            }
+
+            const { type, selectedAttacks } = lastRollConfig;
+
+            selectedAttacks.forEach(({ attackId, attackerName, attackType }) => {
+                let attack;
+
+                if (attackType === 'character') {
+                    attack = characterAttacks.find(a => a.id === attackId);
+                } else {
+                    for (const minion of minions) {
+                        const found = minion.attacks.find(a => a.id === attackId);
+                        if (found) {
+                            attack = found;
+                            break;
+                        }
+                    }
+                }
+
+                if (attack) {
+                    const result = executeAttackRoll(attack, attackerName);
+                    addResult(result);
+                }
+            });
+        }
+
+        // ========================================
+        // RESULTS DISPLAY FUNCTIONS
+        // ========================================
+
+        function addResult(resultData) {
+            const {
+                timestamp,
+                attackerName,
+                attackName,
+                advantageText,
+                attackRoll,
+                damageResults,
+                totalDamage,
+                isCrit,
+                isFumble,
+                saveDC,
+                saveType,
+                hitStatus,
+                targetAC
+            } = resultData;
+
+            const resultClass = isCrit ? 'critical-success' : isFumble ? 'critical-failure' : '';
+            const critText = isCrit ? ' 🎯 CRIT!' : isFumble ? ' 💥 MISS!' : '';
+
+            // Hit/Miss status display
+            let hitStatusDisplay = '';
+            if (hitStatus) {
+                const statusColor = hitStatus === 'MISS' ? '#f44336' : hitStatus === 'CRITICAL HIT' ? '#ffc107' : '#4caf50';
+                hitStatusDisplay = `<span style="color: ${statusColor}; font-weight: bold; margin-left: 8px;">${hitStatus} ${targetAC ? `(AC ${targetAC})` : ''}</span>`;
+            }
+
+            const attackRollDisplay = attackRoll.rolls.length > 1
+                ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
+                : `<span class="dice-result">${attackRoll.rolls[0]}</span>`;
+
+            const damageBreakdown = damageResults.map(dr => {
+                const rollsDisplay = dr.rolls.length > 0
+                    ? `[${dr.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}]`
+                    : '';
+                const bonusDisplay = dr.bonus !== 0 ? ` ${dr.bonus > 0 ? '+' : ''}${dr.bonus}` : '';
+                const typeDisplay = getDamageTypeDisplay(dr.damageType);
+
+                return `
+                    <div class="damage-type-result">
+                        <span>
+                            <span class="damage-type-badge dtype-${dr.damageType}">${typeDisplay}</span>
+                            ${rollsDisplay}${bonusDisplay}
+                        </span>
+                        <span style="font-weight: bold;">${dr.total}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Apply damage button if target is selected
+            const applyDamageBtn = selectedTarget && hitStatus && hitStatus !== 'MISS'
+                ? `<button class="btn-danger btn-small" style="margin-top: 6px;" onclick="applyDamage(${selectedTarget}, ${totalDamage}, 'normal')">💥 Apply ${totalDamage} Damage</button>`
+                : '';
+
+            const html = `
+                <div class="result-item ${resultClass}">
+                    <div class="result-header">
+                        <span>${attackerName} - ${attackName}${advantageText}</span>
+                        <span class="result-timestamp">${timestamp}</span>
+                    </div>
+                    <div class="result-detail">
+                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}${hitStatusDisplay}
+                    </div>
+                    <div class="damage-breakdown">
+                        ${damageBreakdown}
+                        <div class="damage-total">
+                            TOTAL: ${totalDamage}${isCrit ? ' (x2)' : ''}
+                            ${applyDamageBtn}
+                        </div>
+                    </div>
+                    ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC${saveDC} ${saveType}</div>` : ''}
+                </div>
+            `;
+
+            const resultsContainer = document.getElementById('results');
+            const emptyState = resultsContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            resultsContainer.insertAdjacentHTML('afterbegin', html);
+
+            combatLog.unshift(resultData);
+            saveState();
+        }
+
+        function clearResults() {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '<div class="empty-state">No rolls yet</div>';
+            combatLog = [];
+            saveState();
+        }
+
+        function exportLog() {
+            if (combatLog.length === 0) {
+                alert('No combat log to export!');
+                return;
+            }
+
+            let text = '=== COMBAT LOG ===\n\n';
+
+            combatLog.slice().reverse().forEach((entry, index) => {
+                text += `[${entry.timestamp}] ${entry.attackerName} - ${entry.attackName}${entry.advantageText}\n`;
+                text += `  Hit: ${entry.attackRoll.total}`;
+                if (entry.isCrit) text += ' CRITICAL!';
+                if (entry.isFumble) text += ' MISS!';
+                text += '\n  Damage:\n';
+                entry.damageResults.forEach(dr => {
+                    text += `    ${dr.damageType}: ${dr.total}\n`;
+                });
+                text += `  TOTAL: ${entry.totalDamage}`;
+                if (entry.isCrit) text += ' (doubled)';
+                text += '\n';
+                if (entry.saveDC > 0) {
+                    text += `  Save: DC${entry.saveDC} ${entry.saveType}\n`;
+                }
+                text += '\n';
+            });
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `combat-log-${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ========================================
+        // QUICK DICE ROLLER
+        // ========================================
+
+        function rollQuickDice(diceType) {
+            const sides = parseInt(diceType.substring(1));
+            const roll = rollDie(sides);
+
+            const timestamp = new Date().toLocaleTimeString();
+            const html = `
+                <div class="result-item">
+                    <div class="result-header">
+                        <span>Quick ${diceType}</span>
+                        <span class="result-timestamp">${timestamp}</span>
+                    </div>
+                    <div class="result-detail">
+                        <span class="dice-result">${roll}</span>
+                    </div>
+                </div>
+            `;
+
+            const resultsContainer = document.getElementById('results');
+            const emptyState = resultsContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            resultsContainer.insertAdjacentHTML('afterbegin', html);
+        }
+
+        // ========================================
+        // STATE PERSISTENCE (localStorage)
+        // ========================================
+
+        function saveState() {
+            const state = {
+                characterName,
+                characterAttacks,
+                minions,
+                targets,
+                combatLog,
+                initiative,
+                currentTurn,
+                attackTemplates,
+                lastRollConfig,
+                lastDamageRoll,
+                selectedTarget,
+                attackIdCounter,
+                minionIdCounter,
+                targetIdCounter,
+                damageComponentIdCounter,
+                displayMode
+            };
+            localStorage.setItem('combatManagerState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('combatManagerState');
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    characterName = state.characterName || '';
+                    characterAttacks = state.characterAttacks || [];
+                    minions = state.minions || [];
+                    targets = state.targets || [];
+                    combatLog = state.combatLog || [];
+                    initiative = state.initiative || [];
+                    currentTurn = state.currentTurn || 0;
+                    attackTemplates = state.attackTemplates || [];
+                    lastRollConfig = state.lastRollConfig || null;
+                    lastDamageRoll = state.lastDamageRoll || null;
+                    selectedTarget = state.selectedTarget || null;
+                    attackIdCounter = state.attackIdCounter || 0;
+                    minionIdCounter = state.minionIdCounter || 0;
+                    targetIdCounter = state.targetIdCounter || 0;
+                    damageComponentIdCounter = state.damageComponentIdCounter || 0;
+                    displayMode = state.displayMode || 'emoji';
+
+                    // Update toggle button text
+                    const toggleBtn = document.getElementById('displayModeToggle');
+                    if (toggleBtn) {
+                        toggleBtn.textContent = displayMode === 'emoji' ? '🎨 Emoji' : '🔤 Text';
+                    }
+
+                    document.getElementById('characterName').value = characterName;
+                    renderCharacterAttacks();
+                    renderMinions();
+                    renderTargets();
+                    renderInitiative();
+
+                    if (combatLog.length > 0) {
+                        const resultsContainer = document.getElementById('results');
+                        resultsContainer.innerHTML = '';
+                        combatLog.forEach(entry => addResultFromHistory(entry));
+                    }
+                } catch (e) {
+                    console.error('Error loading state:', e);
+                }
+            }
+        }
+
+        function addResultFromHistory(resultData) {
+            const {
+                timestamp,
+                attackerName,
+                attackName,
+                advantageText,
+                attackRoll,
+                damageResults,
+                totalDamage,
+                isCrit,
+                isFumble,
+                saveDC,
+                saveType
+            } = resultData;
+
+            const resultClass = isCrit ? 'critical-success' : isFumble ? 'critical-failure' : '';
+            const critText = isCrit ? ' 🎯 CRIT!' : isFumble ? ' 💥 MISS!' : '';
+
+            const attackRollDisplay = attackRoll.rolls.length > 1
+                ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
+                : `<span class="dice-result">${attackRoll.rolls[0]}</span>`;
+
+            const damageBreakdown = damageResults.map(dr => {
+                const rollsDisplay = dr.rolls.length > 0
+                    ? `[${dr.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}]`
+                    : '';
+                const bonusDisplay = dr.bonus !== 0 ? ` ${dr.bonus > 0 ? '+' : ''}${dr.bonus}` : '';
+                const typeDisplay = getDamageTypeDisplay(dr.damageType);
+
+                return `
+                    <div class="damage-type-result">
+                        <span>
+                            <span class="damage-type-badge dtype-${dr.damageType}">${typeDisplay}</span>
+                            ${rollsDisplay}${bonusDisplay}
+                        </span>
+                        <span style="font-weight: bold;">${dr.total}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const html = `
+                <div class="result-item ${resultClass}">
+                    <div class="result-header">
+                        <span>${attackerName} - ${attackName}${advantageText}</span>
+                        <span class="result-timestamp">${timestamp}</span>
+                    </div>
+                    <div class="result-detail">
+                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
+                    </div>
+                    <div class="damage-breakdown">
+                        ${damageBreakdown}
+                        <div class="damage-total">
+                            TOTAL: ${totalDamage}${isCrit ? ' (x2)' : ''}
+                        </div>
+                    </div>
+                    ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC${saveDC} ${saveType}</div>` : ''}
+                </div>
+            `;
+
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.insertAdjacentHTML('beforeend', html);
+        }
+
+        function saveCharacterName() {
+            characterName = document.getElementById('characterName').value;
+            saveState();
+        }
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+
+        function handleKeyboardShortcut(event) {
+            // Don't trigger shortcuts if typing in an input field
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            const key = event.key.toLowerCase();
+
+            switch(key) {
+                case ' ': // Space = Roll selected
+                    event.preventDefault();
+                    const charCount = characterAttacks.filter(a => a.selected).length;
+                    const minionCount = minions.reduce((count, m) => count + m.attacks.filter(a => a.selected).length, 0);
+
+                    if (charCount > 0) {
+                        rollSelectedAttacks('character');
+                    }
+                    if (minionCount > 0) {
+                        rollSelectedAttacks('minions');
+                    }
+                    if (charCount === 0 && minionCount === 0) {
+                        alert('No attacks selected! Use A to select all character attacks.');
+                    }
+                    break;
+
+                case 'r': // R = Repeat last roll
+                    event.preventDefault();
+                    repeatLastRoll();
+                    break;
+
+                case 'a': // A = Select all character attacks
+                    event.preventDefault();
+                    selectAllAttacks('character', true);
+                    break;
+
+                case 'n': // N = Deselect all
+                    event.preventDefault();
+                    selectAllAttacks('character', false);
+                    selectAllAttacks('minions', false);
+                    break;
+
+                case '+': // + = Add new character attack
+                case '=': // Also handle = (same key without shift)
+                    event.preventDefault();
+                    addCharacterAttack();
+                    break;
+
+                case 'm': // M = Select all minion attacks
+                    event.preventDefault();
+                    selectAllAttacks('minions', true);
+                    break;
+
+                case '?': // ? = Show keyboard shortcuts help
+                    event.preventDefault();
+                    showKeyboardHelp();
+                    break;
+            }
+        }
+
+        function showKeyboardHelp() {
+            alert(`Keyboard Shortcuts:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SPACE   Roll selected attacks
+R       Repeat last roll
+A       Select all character attacks
+M       Select all minion attacks
+N       Deselect all
++       Add new character attack
+?       Show this help
+
+Tips:
+• Space works for both character and minion attacks
+• Shortcuts don't work while typing in fields
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        }
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+
+            if (characterAttacks.length === 0) {
+                renderCharacterAttacks();
+            }
+            if (minions.length === 0) {
+                renderMinions();
+            }
+            if (targets.length === 0) {
+                renderTargets();
+            }
+            if (initiative.length === 0) {
+                renderInitiative();
+            }
+        });
+
+        window.addEventListener('beforeunload', saveState);
+        window.addEventListener('keydown', handleKeyboardShortcut);
+    </script>
+</body>
+</html>
