@@ -578,7 +578,10 @@
     <div class="container">
         <h1>
             <span>⚔️ Quick 5e Combat</span>
-            <span class="settings-toggle" onclick="toggleDisplayMode()" id="displayModeToggle">🎨 Emoji</span>
+            <div style="display: flex; gap: 10px;">
+                <span class="settings-toggle" onclick="toggleDisplayMode()" id="displayModeToggle">🎨 Emoji</span>
+                <span class="settings-toggle" onclick="showKeyboardHelp()" title="Keyboard Shortcuts">⌨️</span>
+            </div>
         </h1>
 
         <div class="main-grid">
@@ -972,6 +975,26 @@
             saveState();
         }
 
+        function duplicateCharacterAttack(id) {
+            const attack = characterAttacks.find(a => a.id === id);
+            if (attack) {
+                const newAttack = {
+                    ...attack,
+                    id: attackIdCounter++,
+                    name: `${attack.name} (Copy)`,
+                    selected: false,
+                    expanded: false,
+                    damageComponents: attack.damageComponents.map(c => ({
+                        ...c,
+                        id: damageComponentIdCounter++
+                    }))
+                };
+                characterAttacks.push(newAttack);
+                renderCharacterAttacks();
+                saveState();
+            }
+        }
+
         function updateCharacterAttack(id, field, value) {
             const attack = characterAttacks.find(a => a.id === id);
             if (attack) {
@@ -1096,6 +1119,7 @@
 
                         <div class="attack-actions" onclick="event.stopPropagation()">
                             <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'character')">🎲 Roll</button>
+                            <button class="btn-info btn-small" onclick="duplicateCharacterAttack(${attack.id})">📋 Dup</button>
                             <button class="btn-danger btn-small" onclick="removeCharacterAttack(${attack.id})">Remove</button>
                         </div>
                     </div>
@@ -1136,25 +1160,38 @@
         function addMinionAttack(minionId) {
             const minion = minions.find(m => m.id === minionId);
             if (minion) {
-                const nextNumber = minion.attacks.length + 1;
-                const attack = {
-                    id: attackIdCounter++,
-                    minionIdentifier: `#${nextNumber}`,
-                    name: 'Attack',
-                    attackBonus: 0,
-                    damageComponents: [{
-                        id: damageComponentIdCounter++,
-                        dice: '1d8',
-                        bonus: 0,
-                        damageType: 'slashing'
-                    }],
-                    saveDC: 0,
-                    saveType: 'DEX',
-                    advantage: 'normal',
-                    selected: false,
-                    expanded: true
-                };
-                minion.attacks.push(attack);
+                // Prompt for how many to add
+                const countStr = prompt('How many minions to add?', '1');
+                if (countStr === null) return; // User cancelled
+
+                const count = parseInt(countStr);
+                if (isNaN(count) || count < 1 || count > 50) {
+                    alert('Please enter a number between 1 and 50');
+                    return;
+                }
+
+                // Add the specified number of attacks
+                for (let i = 0; i < count; i++) {
+                    const nextNumber = minion.attacks.length + 1;
+                    const attack = {
+                        id: attackIdCounter++,
+                        minionIdentifier: `#${nextNumber}`,
+                        name: 'Attack',
+                        attackBonus: 0,
+                        damageComponents: [{
+                            id: damageComponentIdCounter++,
+                            dice: '1d8',
+                            bonus: 0,
+                            damageType: 'slashing'
+                        }],
+                        saveDC: 0,
+                        saveType: 'DEX',
+                        advantage: 'normal',
+                        selected: false,
+                        expanded: i === 0 // Only expand the first one
+                    };
+                    minion.attacks.push(attack);
+                }
                 renderMinions();
                 saveState();
             }
@@ -1166,6 +1203,30 @@
                 minion.attacks = minion.attacks.filter(a => a.id !== attackId);
                 renderMinions();
                 saveState();
+            }
+        }
+
+        function duplicateMinionAttack(minionId, attackId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack) {
+                    const nextNumber = minion.attacks.length + 1;
+                    const newAttack = {
+                        ...attack,
+                        id: attackIdCounter++,
+                        minionIdentifier: `#${nextNumber}`,
+                        selected: false,
+                        expanded: false,
+                        damageComponents: attack.damageComponents.map(c => ({
+                            ...c,
+                            id: damageComponentIdCounter++
+                        }))
+                    };
+                    minion.attacks.push(newAttack);
+                    renderMinions();
+                    saveState();
+                }
             }
         }
 
@@ -1302,6 +1363,7 @@
 
                                 <div class="attack-actions" onclick="event.stopPropagation()">
                                     <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'minion', ${minion.id})">🎲 Roll</button>
+                                    <button class="btn-info btn-small" onclick="duplicateMinionAttack(${minion.id}, ${attack.id})">📋 Dup</button>
                                     <button class="btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})">Remove</button>
                                 </div>
                             </div>
@@ -1746,6 +1808,86 @@
         }
 
         // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+
+        function handleKeyboardShortcut(event) {
+            // Don't trigger shortcuts if typing in an input field
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            const key = event.key.toLowerCase();
+
+            switch(key) {
+                case ' ': // Space = Roll selected
+                    event.preventDefault();
+                    const charCount = characterAttacks.filter(a => a.selected).length;
+                    const minionCount = minions.reduce((count, m) => count + m.attacks.filter(a => a.selected).length, 0);
+
+                    if (charCount > 0) {
+                        rollSelectedAttacks('character');
+                    }
+                    if (minionCount > 0) {
+                        rollSelectedAttacks('minions');
+                    }
+                    if (charCount === 0 && minionCount === 0) {
+                        alert('No attacks selected! Use A to select all character attacks.');
+                    }
+                    break;
+
+                case 'r': // R = Repeat last roll
+                    event.preventDefault();
+                    repeatLastRoll();
+                    break;
+
+                case 'a': // A = Select all character attacks
+                    event.preventDefault();
+                    selectAllAttacks('character', true);
+                    break;
+
+                case 'n': // N = Deselect all
+                    event.preventDefault();
+                    selectAllAttacks('character', false);
+                    selectAllAttacks('minions', false);
+                    break;
+
+                case '+': // + = Add new character attack
+                case '=': // Also handle = (same key without shift)
+                    event.preventDefault();
+                    addCharacterAttack();
+                    break;
+
+                case 'm': // M = Select all minion attacks
+                    event.preventDefault();
+                    selectAllAttacks('minions', true);
+                    break;
+
+                case '?': // ? = Show keyboard shortcuts help
+                    event.preventDefault();
+                    showKeyboardHelp();
+                    break;
+            }
+        }
+
+        function showKeyboardHelp() {
+            alert(`Keyboard Shortcuts:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SPACE   Roll selected attacks
+R       Repeat last roll
+A       Select all character attacks
+M       Select all minion attacks
+N       Deselect all
++       Add new character attack
+?       Show this help
+
+Tips:
+• Space works for both character and minion attacks
+• Shortcuts don't work while typing in fields
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        }
+
+        // ========================================
         // INITIALIZATION
         // ========================================
 
@@ -1761,6 +1903,7 @@
         });
 
         window.addEventListener('beforeunload', saveState);
+        window.addEventListener('keydown', handleKeyboardShortcut);
     </script>
 </body>
 </html>
