@@ -57,9 +57,59 @@
 
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
             margin-bottom: 10px;
+        }
+
+        .initiative-tracker {
+            grid-column: 1 / -1;
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            margin-bottom: 10px;
+        }
+
+        .initiative-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            min-height: 40px;
+            align-items: center;
+        }
+
+        .initiative-item {
+            background: white;
+            border: 2px solid #ff9800;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .initiative-item.active {
+            background: #4caf50;
+            color: white;
+            border-color: #388e3c;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        .initiative-item .init-value {
+            background: #ff9800;
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .initiative-item.active .init-value {
+            background: #2e7d32;
         }
 
         .card {
@@ -544,6 +594,174 @@
             }
         }
 
+        .target-item {
+            background: #f5f5f5;
+            border: 2px solid #9e9e9e;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .target-item.bloodied {
+            border-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .target-item.dying {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .target-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .target-name {
+            font-weight: bold;
+            font-size: 13px;
+            color: #2a5298;
+        }
+
+        .target-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .hp-bar-container {
+            grid-column: 1 / -1;
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 16px;
+            overflow: hidden;
+            position: relative;
+            margin: 6px 0;
+        }
+
+        .hp-bar {
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            height: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .hp-bar.bloodied {
+            background: linear-gradient(90deg, #ff9800, #ffc107);
+        }
+
+        .hp-bar.dying {
+            background: linear-gradient(90deg, #f44336, #e57373);
+        }
+
+        .target-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #2a5298;
+            color: white;
+            border: none;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .template-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #2a5298;
+            padding-bottom: 10px;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .template-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .template-item {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-item:hover {
+            background: #e3f2fd;
+            border-color: #2a5298;
+        }
+
+        .conditions-badges {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .condition-badge {
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            background: #9c27b0;
+            color: white;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .main-grid {
                 grid-template-columns: 1fr;
@@ -571,6 +789,10 @@
             .stat-badge {
                 padding: 1px 4px;
             }
+
+            .floating-action-btn {
+                display: flex;
+            }
         }
     </style>
 </head>
@@ -581,8 +803,24 @@
             <div style="display: flex; gap: 10px;">
                 <span class="settings-toggle" onclick="toggleDisplayMode()" id="displayModeToggle">🎨 Emoji</span>
                 <span class="settings-toggle" onclick="showKeyboardHelp()" title="Keyboard Shortcuts">⌨️</span>
+                <span class="settings-toggle" onclick="openTemplateModal()" title="Attack Templates">📋</span>
             </div>
         </h1>
+
+        <!-- Initiative Tracker -->
+        <div class="card initiative-tracker">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h2 style="margin: 0; border: none; padding: 0;">⚡ Initiative</h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-success btn-small" onclick="rollInitiative()">Roll Init</button>
+                    <button class="btn-primary btn-small" onclick="nextTurn()">Next →</button>
+                    <button class="btn-secondary btn-small" onclick="clearInitiative()">Clear</button>
+                </div>
+            </div>
+            <div class="initiative-list" id="initiativeList">
+                <div class="empty-state" style="margin: 0; padding: 10px;">No initiative rolled</div>
+            </div>
+        </div>
 
         <div class="main-grid">
             <!-- Character Section -->
@@ -634,6 +872,15 @@
                 <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addMinion()">➕ Add Group</button>
             </div>
 
+            <!-- Targets Section -->
+            <div class="card">
+                <h2>🎯 Targets</h2>
+
+                <div id="targets"></div>
+
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addTarget()">➕ Add Target</button>
+            </div>
+
             <!-- Combat Log -->
             <div class="card combat-log-card">
                 <div class="log-header">
@@ -649,6 +896,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Template Modal -->
+    <div class="template-modal" id="templateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0;">Attack Templates</h2>
+                <span class="modal-close" onclick="closeTemplateModal()">×</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <button class="btn-primary btn-small" onclick="importTemplateJSON()" style="flex: 1;">📥 Import JSON</button>
+                <button class="btn-info btn-small" onclick="exportTemplateJSON()" style="flex: 1;">📤 Export JSON</button>
+            </div>
+            <div class="template-list" id="templateList">
+                <div class="empty-state">No templates saved yet</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button (Mobile) -->
+    <button class="floating-action-btn" onclick="rollSelectedAttacks('character'); rollSelectedAttacks('minions')">
+        🎲
+    </button>
 
     <script>
         // ========================================
@@ -712,10 +981,19 @@
         let characterName = '';
         let characterAttacks = [];
         let minions = [];
+        let targets = [];
         let combatLog = [];
+        let initiative = [];
+        let currentTurn = 0;
+        let attackTemplates = [];
         let lastRollConfig = null;
+        let lastDamageRoll = null;
+        let selectedTarget = null;
+        let history = [];
+        let historyIndex = -1;
         let attackIdCounter = 0;
         let minionIdCounter = 0;
+        let targetIdCounter = 0;
         let damageComponentIdCounter = 0;
         let displayMode = 'emoji'; // 'emoji' or 'text'
 
@@ -961,6 +1239,7 @@
                 saveDC: 0,
                 saveType: 'DEX',
                 advantage: 'normal',
+                rollCount: 1,
                 selected: false,
                 expanded: true
             };
@@ -1040,6 +1319,7 @@
             container.innerHTML = characterAttacks.map(attack => {
                 const damageSummary = getDamageSummary(attack.damageComponents);
                 const advDisplay = getAdvantageDisplay(attack.advantage);
+                const countDisplay = attack.rollCount && attack.rollCount > 1 ? `×${attack.rollCount}` : '';
                 return `
                 <div class="attack-item ${attack.selected ? 'selected' : ''} ${attack.expanded ? 'expanded' : ''}" data-attack-id="${attack.id}">
                     <div class="attack-compact" onclick="toggleExpand(${attack.id}, 'character')">
@@ -1048,7 +1328,7 @@
                                ${attack.selected ? 'checked' : ''}
                                onclick="event.stopPropagation(); toggleAttackSelection(${attack.id}, 'character')">
                         <div class="attack-info">
-                            <div class="attack-name">${attack.name}</div>
+                            <div class="attack-name">${attack.name}${countDisplay ? ` <span style="color: #ff9800; font-weight: bold;">${countDisplay}</span>` : ''}</div>
                             <div class="attack-stats">
                                 <span class="stat-badge stat-hit">+${attack.attackBonus}</span>
                                 <span class="stat-badge stat-dmg">${damageSummary}</span>
@@ -1072,6 +1352,15 @@
                                 <input type="number"
                                        value="${attack.attackBonus}"
                                        onchange="updateCharacterAttack(${attack.id}, 'attackBonus', parseInt(this.value))"
+                                       onclick="event.stopPropagation()">
+                            </div>
+                            <div class="form-group">
+                                <label>× Count</label>
+                                <input type="number"
+                                       value="${attack.rollCount || 1}"
+                                       min="1"
+                                       max="10"
+                                       onchange="updateCharacterAttack(${attack.id}, 'rollCount', parseInt(this.value) || 1)"
                                        onclick="event.stopPropagation()">
                             </div>
                             <div class="form-group">
@@ -1120,6 +1409,7 @@
                         <div class="attack-actions" onclick="event.stopPropagation()">
                             <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'character')">🎲 Roll</button>
                             <button class="btn-info btn-small" onclick="duplicateCharacterAttack(${attack.id})">📋 Dup</button>
+                            <button class="btn-secondary btn-small" onclick="saveAttackAsTemplate(characterAttacks.find(a => a.id === ${attack.id}), 'character')">💾 Save</button>
                             <button class="btn-danger btn-small" onclick="removeCharacterAttack(${attack.id})">Remove</button>
                         </div>
                     </div>
@@ -1187,6 +1477,7 @@
                         saveDC: 0,
                         saveType: 'DEX',
                         advantage: 'normal',
+                        rollCount: 1,
                         selected: false,
                         expanded: i === 0 // Only expand the first one
                     };
@@ -1246,6 +1537,45 @@
             }
         }
 
+        function applyToAllInGroup(minionId, sourceAttackId) {
+            if (!confirm('Apply this attack\'s stats to ALL attacks in this group?\n(Name, attack bonus, damage, save DC, advantage)\n\nIndividual identifiers (#1, #2, etc.) will be preserved.')) {
+                return;
+            }
+
+            const minion = minions.find(m => m.id === minionId);
+            if (!minion) return;
+
+            const sourceAttack = minion.attacks.find(a => a.id === sourceAttackId);
+            if (!sourceAttack) return;
+
+            minion.attacks.forEach(attack => {
+                if (attack.id !== sourceAttackId) {
+                    // Copy stats but preserve identifier and ID
+                    const preservedId = attack.minionIdentifier;
+                    const preservedAttackId = attack.id;
+                    const preservedSelected = attack.selected;
+                    const preservedExpanded = attack.expanded;
+
+                    Object.assign(attack, JSON.parse(JSON.stringify(sourceAttack)));
+
+                    attack.id = preservedAttackId;
+                    attack.minionIdentifier = preservedId;
+                    attack.selected = preservedSelected;
+                    attack.expanded = preservedExpanded;
+
+                    // Regenerate damage component IDs
+                    attack.damageComponents = attack.damageComponents.map(c => ({
+                        ...c,
+                        id: damageComponentIdCounter++
+                    }));
+                }
+            });
+
+            renderMinions();
+            saveState();
+            alert(`Applied to ${minion.attacks.length} attacks in group!`);
+        }
+
         function toggleMinionAttackSelection(minionId, attackId) {
             const minion = minions.find(m => m.id === minionId);
             if (minion) {
@@ -1276,6 +1606,7 @@
                     ${minion.attacks.map(attack => {
                         const damageSummary = getDamageSummary(attack.damageComponents);
                         const advDisplay = getAdvantageDisplay(attack.advantage);
+                        const countDisplay = attack.rollCount && attack.rollCount > 1 ? `×${attack.rollCount}` : '';
                         return `
                         <div class="attack-item ${attack.selected ? 'selected' : ''} ${attack.expanded ? 'expanded' : ''}" data-attack-id="${attack.id}" style="background: white;">
                             <div class="attack-compact" onclick="toggleExpand(${attack.id}, 'minion')">
@@ -1284,7 +1615,7 @@
                                        ${attack.selected ? 'checked' : ''}
                                        onclick="event.stopPropagation(); toggleMinionAttackSelection(${minion.id}, ${attack.id})">
                                 <div class="attack-info">
-                                    <div class="attack-name">${attack.minionIdentifier} ${attack.name}</div>
+                                    <div class="attack-name">${attack.minionIdentifier} ${attack.name}${countDisplay ? ` <span style="color: #ff9800; font-weight: bold;">${countDisplay}</span>` : ''}</div>
                                     <div class="attack-stats">
                                         <span class="stat-badge stat-hit">+${attack.attackBonus}</span>
                                         <span class="stat-badge stat-dmg">${damageSummary}</span>
@@ -1316,6 +1647,15 @@
                                         <input type="number"
                                                value="${attack.attackBonus}"
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'attackBonus', parseInt(this.value))"
+                                               onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>× Count</label>
+                                        <input type="number"
+                                               value="${attack.rollCount || 1}"
+                                               min="1"
+                                               max="10"
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'rollCount', parseInt(this.value) || 1)"
                                                onclick="event.stopPropagation()">
                                     </div>
                                     <div class="form-group">
@@ -1364,6 +1704,8 @@
                                 <div class="attack-actions" onclick="event.stopPropagation()">
                                     <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'minion', ${minion.id})">🎲 Roll</button>
                                     <button class="btn-info btn-small" onclick="duplicateMinionAttack(${minion.id}, ${attack.id})">📋 Dup</button>
+                                    <button class="btn-secondary btn-small" onclick="saveAttackAsTemplate(minions.find(m => m.id === ${minion.id}).attacks.find(a => a.id === ${attack.id}), 'minion')">💾 Save</button>
+                                    ${minion.attacks.length > 1 ? `<button class="btn-warning btn-small" onclick="applyToAllInGroup(${minion.id}, ${attack.id})">↓ Apply to All</button>` : ''}
                                     <button class="btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})">Remove</button>
                                 </div>
                             </div>
@@ -1377,6 +1719,400 @@
                 </div>
             `).join('');
             updateRollButtonCounts();
+        }
+
+        // ========================================
+        // TARGET MANAGEMENT FUNCTIONS
+        // ========================================
+
+        function addTarget() {
+            const target = {
+                id: targetIdCounter++,
+                name: 'Target',
+                currentHP: 20,
+                maxHP: 20,
+                ac: 15,
+                initiative: 10,
+                resistances: [],
+                vulnerabilities: [],
+                immunities: [],
+                conditions: []
+            };
+            targets.push(target);
+            renderTargets();
+            saveState();
+        }
+
+        function removeTarget(id) {
+            targets = targets.filter(t => t.id !== id);
+            if (selectedTarget === id) selectedTarget = null;
+            renderTargets();
+            saveState();
+        }
+
+        function updateTarget(id, field, value) {
+            const target = targets.find(t => t.id === id);
+            if (target) {
+                target[field] = value;
+                renderTargets();
+                saveState();
+            }
+        }
+
+        function applyDamage(targetId, amount, damageType = 'normal') {
+            const target = targets.find(t => t.id === targetId);
+            if (!target) return;
+
+            let finalDamage = amount;
+
+            // Apply resistance/vulnerability/immunity
+            if (target.immunities.includes(damageType)) {
+                finalDamage = 0;
+            } else if (target.resistances.includes(damageType)) {
+                finalDamage = Math.floor(amount / 2);
+            } else if (target.vulnerabilities.includes(damageType)) {
+                finalDamage = amount * 2;
+            }
+
+            target.currentHP = Math.max(0, target.currentHP - finalDamage);
+            renderTargets();
+            saveState();
+
+            // Log the damage
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = {
+                timestamp,
+                targetName: target.name,
+                damage: finalDamage,
+                damageType,
+                newHP: target.currentHP
+            };
+            addToLog(`[${timestamp}] ${target.name} takes ${finalDamage} ${damageType} damage → ${target.currentHP}/${target.maxHP} HP`);
+        }
+
+        function healTarget(targetId, amount) {
+            const target = targets.find(t => t.id === targetId);
+            if (!target) return;
+
+            target.currentHP = Math.min(target.maxHP, target.currentHP + amount);
+            renderTargets();
+            saveState();
+
+            const timestamp = new Date().toLocaleTimeString();
+            addToLog(`[${timestamp}] ${target.name} heals ${amount} HP → ${target.currentHP}/${target.maxHP} HP`);
+        }
+
+        function selectTargetForDamage(targetId) {
+            selectedTarget = targetId;
+            renderTargets();
+        }
+
+        function renderTargets() {
+            const container = document.getElementById('targets');
+            if (targets.length === 0) {
+                container.innerHTML = '<p class="empty-state">No targets yet</p>';
+                return;
+            }
+
+            container.innerHTML = targets.map(target => {
+                const hpPercent = (target.currentHP / target.maxHP) * 100;
+                let hpClass = '';
+                let targetClass = '';
+                if (hpPercent <= 0) {
+                    hpClass = 'dying';
+                    targetClass = 'dying';
+                } else if (hpPercent <= 50) {
+                    hpClass = 'bloodied';
+                    targetClass = 'bloodied';
+                }
+
+                const isSelected = selectedTarget === target.id;
+
+                return `
+                    <div class="target-item ${targetClass} ${isSelected ? 'selected' : ''}" data-target-id="${target.id}">
+                        <div class="target-header">
+                            <input type="text"
+                                   value="${target.name}"
+                                   style="font-weight: bold; font-size: 13px; border: none; background: transparent; width: 100%;"
+                                   onchange="updateTarget(${target.id}, 'name', this.value)">
+                            <button class="btn-danger btn-small" onclick="removeTarget(${target.id})">×</button>
+                        </div>
+
+                        <div class="hp-bar-container">
+                            <div class="hp-bar ${hpClass}" style="width: ${hpPercent}%">
+                                ${target.currentHP}/${target.maxHP}
+                            </div>
+                        </div>
+
+                        <div class="target-stats">
+                            <div>
+                                <strong>AC:</strong>
+                                <input type="number" value="${target.ac}" style="width: 50px;" onchange="updateTarget(${target.id}, 'ac', parseInt(this.value))">
+                            </div>
+                            <div>
+                                <strong>Init:</strong>
+                                <input type="number" value="${target.initiative}" style="width: 50px;" onchange="updateTarget(${target.id}, 'initiative', parseInt(this.value))">
+                            </div>
+                            <div>
+                                <strong>Current HP:</strong>
+                                <input type="number" value="${target.currentHP}" style="width: 50px;" onchange="updateTarget(${target.id}, 'currentHP', parseInt(this.value))">
+                            </div>
+                            <div>
+                                <strong>Max HP:</strong>
+                                <input type="number" value="${target.maxHP}" style="width: 50px;" onchange="updateTarget(${target.id}, 'maxHP', parseInt(this.value))">
+                            </div>
+                        </div>
+
+                        <div class="target-actions">
+                            <button class="btn-danger btn-small" onclick="applyDamagePrompt(${target.id})">💥 Damage</button>
+                            <button class="btn-success btn-small" onclick="healPrompt(${target.id})">💚 Heal</button>
+                            <button class="btn-info btn-small" onclick="selectTargetForDamage(${target.id})">${isSelected ? '✓ Selected' : 'Select'}</button>
+                        </div>
+
+                        ${target.conditions.length > 0 ? `
+                            <div class="conditions-badges">
+                                ${target.conditions.map(c => `<span class="condition-badge">${c}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function applyDamagePrompt(targetId) {
+            const amount = prompt('Damage amount:', lastDamageRoll ? lastDamageRoll.toString() : '10');
+            if (amount === null || isNaN(amount)) return;
+            applyDamage(targetId, parseInt(amount), 'normal');
+        }
+
+        function healPrompt(targetId) {
+            const amount = prompt('Heal amount:', '10');
+            if (amount === null || isNaN(amount)) return;
+            healTarget(targetId, parseInt(amount));
+        }
+
+        function addToLog(message) {
+            const resultsContainer = document.getElementById('results');
+            const html = `
+                <div class="result-item">
+                    <div class="result-detail">${message}</div>
+                </div>
+            `;
+            resultsContainer.insertAdjacentHTML('afterbegin', html);
+        }
+
+        // ========================================
+        // INITIATIVE TRACKER FUNCTIONS
+        // ========================================
+
+        function rollInitiative() {
+            initiative = [];
+
+            // Add character
+            if (characterName) {
+                const roll = rollDie(20);
+                initiative.push({
+                    name: characterName || 'Character',
+                    initiative: roll,
+                    type: 'character'
+                });
+            }
+
+            // Add minions
+            minions.forEach(minion => {
+                minion.attacks.forEach(attack => {
+                    const roll = rollDie(20);
+                    const name = attack.minionIdentifier ? `${minion.name} ${attack.minionIdentifier}` : minion.name;
+                    initiative.push({
+                        name,
+                        initiative: roll,
+                        type: 'minion'
+                    });
+                });
+            });
+
+            // Add targets
+            targets.forEach(target => {
+                initiative.push({
+                    name: target.name,
+                    initiative: target.initiative + rollDie(20),
+                    type: 'target',
+                    targetId: target.id
+                });
+            });
+
+            // Sort by initiative (highest first)
+            initiative.sort((a, b) => b.initiative - a.initiative);
+            currentTurn = 0;
+            renderInitiative();
+            saveState();
+        }
+
+        function nextTurn() {
+            if (initiative.length === 0) return;
+            currentTurn = (currentTurn + 1) % initiative.length;
+            renderInitiative();
+            saveState();
+        }
+
+        function clearInitiative() {
+            initiative = [];
+            currentTurn = 0;
+            renderInitiative();
+            saveState();
+        }
+
+        function renderInitiative() {
+            const container = document.getElementById('initiativeList');
+            if (initiative.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="margin: 0; padding: 10px;">No initiative rolled</div>';
+                return;
+            }
+
+            container.innerHTML = initiative.map((entry, index) => {
+                const isActive = index === currentTurn;
+                return `
+                    <div class="initiative-item ${isActive ? 'active' : ''}" onclick="currentTurn = ${index}; renderInitiative();">
+                        <span class="init-value">${entry.initiative}</span>
+                        <span>${entry.name}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ========================================
+        // TEMPLATE FUNCTIONS
+        // ========================================
+
+        function openTemplateModal() {
+            document.getElementById('templateModal').style.display = 'flex';
+            renderTemplates();
+        }
+
+        function closeTemplateModal() {
+            document.getElementById('templateModal').style.display = 'none';
+        }
+
+        function saveAttackAsTemplate(attack, type) {
+            const name = prompt('Template name:', attack.name);
+            if (!name) return;
+
+            const template = {
+                name,
+                attack: JSON.parse(JSON.stringify(attack)), // Deep clone
+                type
+            };
+
+            attackTemplates.push(template);
+            saveState();
+            alert(`Template "${name}" saved!`);
+        }
+
+        function loadTemplate(templateIndex) {
+            const template = attackTemplates[templateIndex];
+            if (!template) return;
+
+            const attack = JSON.parse(JSON.stringify(template.attack)); // Deep clone
+            attack.id = attackIdCounter++;
+            attack.selected = false;
+            attack.expanded = true;
+            attack.damageComponents = attack.damageComponents.map(c => ({
+                ...c,
+                id: damageComponentIdCounter++
+            }));
+
+            if (template.type === 'character') {
+                characterAttacks.push(attack);
+                renderCharacterAttacks();
+            } else {
+                // Add to first minion group or create one
+                if (minions.length === 0) {
+                    addMinion();
+                }
+                attack.minionIdentifier = `#${minions[0].attacks.length + 1}`;
+                minions[0].attacks.push(attack);
+                renderMinions();
+            }
+
+            saveState();
+            closeTemplateModal();
+        }
+
+        function deleteTemplate(index) {
+            if (!confirm('Delete this template?')) return;
+            attackTemplates.splice(index, 1);
+            saveState();
+            renderTemplates();
+        }
+
+        function renderTemplates() {
+            const container = document.getElementById('templateList');
+            if (attackTemplates.length === 0) {
+                container.innerHTML = '<div class="empty-state">No templates saved yet</div>';
+                return;
+            }
+
+            container.innerHTML = attackTemplates.map((template, index) => {
+                const attack = template.attack;
+                const damageSummary = getDamageSummary(attack.damageComponents);
+                return `
+                    <div class="template-item" onclick="loadTemplate(${index})">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong>${template.name}</strong>
+                            <button class="btn-danger btn-small" onclick="event.stopPropagation(); deleteTemplate(${index})">×</button>
+                        </div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                            +${attack.attackBonus} • ${damageSummary}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function exportTemplateJSON() {
+            if (attackTemplates.length === 0) {
+                alert('No templates to export!');
+                return;
+            }
+
+            const json = JSON.stringify(attackTemplates, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `attack-templates-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importTemplateJSON() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        if (!Array.isArray(imported)) {
+                            alert('Invalid template file format!');
+                            return;
+                        }
+
+                        attackTemplates = attackTemplates.concat(imported);
+                        saveState();
+                        renderTemplates();
+                        alert(`Imported ${imported.length} templates!`);
+                    } catch (error) {
+                        alert('Error reading template file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
         }
 
         // ========================================
@@ -1401,8 +2137,15 @@
 
             if (!attack) return;
 
-            const result = executeAttackRoll(attack, attackerName);
-            addResult(result);
+            // Roll multiple times if rollCount > 1
+            const count = attack.rollCount || 1;
+            for (let i = 0; i < count; i++) {
+                const result = executeAttackRoll(attack, attackerName);
+                if (count > 1) {
+                    result.attackName = `${attack.name} #${i + 1}`;
+                }
+                addResult(result);
+            }
         }
 
         function rollSelectedAttacks(type) {
@@ -1490,6 +2233,28 @@
 
             const totalDamage = damageResults.reduce((sum, dr) => sum + dr.total, 0);
 
+            // Track last damage for quick application
+            lastDamageRoll = totalDamage;
+
+            // Check against selected target
+            let hitStatus = null;
+            let targetAC = null;
+            if (selectedTarget) {
+                const target = targets.find(t => t.id === selectedTarget);
+                if (target) {
+                    targetAC = target.ac;
+                    if (isCrit) {
+                        hitStatus = 'CRITICAL HIT';
+                    } else if (isFumble) {
+                        hitStatus = 'MISS';
+                    } else if (attackRoll.total >= target.ac) {
+                        hitStatus = 'HIT';
+                    } else {
+                        hitStatus = 'MISS';
+                    }
+                }
+            }
+
             const timestamp = new Date().toLocaleTimeString();
 
             return {
@@ -1503,7 +2268,9 @@
                 isCrit,
                 isFumble,
                 saveDC: attack.saveDC,
-                saveType: attack.saveType
+                saveType: attack.saveType,
+                hitStatus,
+                targetAC
             };
         }
 
@@ -1553,11 +2320,20 @@
                 isCrit,
                 isFumble,
                 saveDC,
-                saveType
+                saveType,
+                hitStatus,
+                targetAC
             } = resultData;
 
             const resultClass = isCrit ? 'critical-success' : isFumble ? 'critical-failure' : '';
             const critText = isCrit ? ' 🎯 CRIT!' : isFumble ? ' 💥 MISS!' : '';
+
+            // Hit/Miss status display
+            let hitStatusDisplay = '';
+            if (hitStatus) {
+                const statusColor = hitStatus === 'MISS' ? '#f44336' : hitStatus === 'CRITICAL HIT' ? '#ffc107' : '#4caf50';
+                hitStatusDisplay = `<span style="color: ${statusColor}; font-weight: bold; margin-left: 8px;">${hitStatus} ${targetAC ? `(AC ${targetAC})` : ''}</span>`;
+            }
 
             const attackRollDisplay = attackRoll.rolls.length > 1
                 ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
@@ -1581,6 +2357,11 @@
                 `;
             }).join('');
 
+            // Apply damage button if target is selected
+            const applyDamageBtn = selectedTarget && hitStatus && hitStatus !== 'MISS'
+                ? `<button class="btn-danger btn-small" style="margin-top: 6px;" onclick="applyDamage(${selectedTarget}, ${totalDamage}, 'normal')">💥 Apply ${totalDamage} Damage</button>`
+                : '';
+
             const html = `
                 <div class="result-item ${resultClass}">
                     <div class="result-header">
@@ -1588,12 +2369,13 @@
                         <span class="result-timestamp">${timestamp}</span>
                     </div>
                     <div class="result-detail">
-                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
+                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}${hitStatusDisplay}
                     </div>
                     <div class="damage-breakdown">
                         ${damageBreakdown}
                         <div class="damage-total">
                             TOTAL: ${totalDamage}${isCrit ? ' (x2)' : ''}
+                            ${applyDamageBtn}
                         </div>
                     </div>
                     ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC${saveDC} ${saveType}</div>` : ''}
@@ -1693,10 +2475,17 @@
                 characterName,
                 characterAttacks,
                 minions,
+                targets,
                 combatLog,
+                initiative,
+                currentTurn,
+                attackTemplates,
                 lastRollConfig,
+                lastDamageRoll,
+                selectedTarget,
                 attackIdCounter,
                 minionIdCounter,
+                targetIdCounter,
                 damageComponentIdCounter,
                 displayMode
             };
@@ -1711,10 +2500,17 @@
                     characterName = state.characterName || '';
                     characterAttacks = state.characterAttacks || [];
                     minions = state.minions || [];
+                    targets = state.targets || [];
                     combatLog = state.combatLog || [];
+                    initiative = state.initiative || [];
+                    currentTurn = state.currentTurn || 0;
+                    attackTemplates = state.attackTemplates || [];
                     lastRollConfig = state.lastRollConfig || null;
+                    lastDamageRoll = state.lastDamageRoll || null;
+                    selectedTarget = state.selectedTarget || null;
                     attackIdCounter = state.attackIdCounter || 0;
                     minionIdCounter = state.minionIdCounter || 0;
+                    targetIdCounter = state.targetIdCounter || 0;
                     damageComponentIdCounter = state.damageComponentIdCounter || 0;
                     displayMode = state.displayMode || 'emoji';
 
@@ -1727,6 +2523,8 @@
                     document.getElementById('characterName').value = characterName;
                     renderCharacterAttacks();
                     renderMinions();
+                    renderTargets();
+                    renderInitiative();
 
                     if (combatLog.length > 0) {
                         const resultsContainer = document.getElementById('results');
@@ -1899,6 +2697,12 @@ Tips:
             }
             if (minions.length === 0) {
                 renderMinions();
+            }
+            if (targets.length === 0) {
+                renderTargets();
+            }
+            if (initiative.length === 0) {
+                renderInitiative();
             }
         });
 
