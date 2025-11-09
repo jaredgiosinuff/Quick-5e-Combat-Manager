@@ -2268,24 +2268,32 @@
             }
 
             if (matches.length > 0 && input) {
-                dropdown.innerHTML = matches.map((match, index) => {
+                // Clear previous content and event listeners
+                dropdown.innerHTML = '';
+
+                matches.forEach((match, index) => {
                     const damageSummary = getDamageSummary(match.damageComponents);
                     const saveInfo = match.saveDC > 0 ? `DC${match.saveDC} ${match.saveType}` : '';
                     const hitInfo = match.attackBonus !== 0 ? `+${match.attackBonus} to hit` : '';
                     const details = [hitInfo, damageSummary, saveInfo].filter(x => x).join(' | ');
 
-                    return `
-                        <div class="autocomplete-item"
-                             data-attack-name="${match.name.replace(/"/g, '&quot;')}"
-                             data-attack-id="${attackId}"
-                             data-attack-type="${type}"
-                             data-minion-id="${minionId}"
-                             onclick="event.stopPropagation(); selectAutocompleteByData(this)">
-                            <div class="autocomplete-item-name">${match.name}</div>
-                            <div class="autocomplete-item-details">${details}</div>
-                        </div>
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.innerHTML = `
+                        <div class="autocomplete-item-name">${match.name}</div>
+                        <div class="autocomplete-item-details">${details}</div>
                     `;
-                }).join('');
+
+                    // Add click event listener directly - this is more reliable than inline onclick
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        console.log('Autocomplete clicked:', match.name);
+                        selectAutocomplete(match.name, attackId, type, minionId);
+                    });
+
+                    dropdown.appendChild(item);
+                });
+
                 dropdown.style.display = 'block';
                 activeAutocompleteInput = event.target;
             } else {
