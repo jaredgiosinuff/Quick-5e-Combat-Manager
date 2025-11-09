@@ -2294,6 +2294,8 @@
                     // Add click event listener directly - this is more reliable than inline onclick
                     item.addEventListener('click', function(e) {
                         e.stopPropagation();
+                        e.preventDefault();
+
                         console.log('========================================');
                         console.log('🎯 AUTOCOMPLETE CLICKED!');
                         console.log('Attack name:', match.name);
@@ -2301,7 +2303,14 @@
                         console.log('Type:', type);
                         console.log('Minion ID:', minionId);
                         console.log('========================================');
-                        selectAutocomplete(match.name, attackId, type, minionId);
+
+                        // Hide dropdown IMMEDIATELY before applying template
+                        dropdown.style.display = 'none';
+
+                        // Apply template on next tick to ensure dropdown is hidden first
+                        setTimeout(function() {
+                            selectAutocomplete(match.name, attackId, type, minionId);
+                        }, 0);
                     });
 
                     dropdown.appendChild(item);
