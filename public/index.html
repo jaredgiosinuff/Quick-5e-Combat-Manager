@@ -2256,8 +2256,12 @@
         }
 
         function handleAttackNameInput(event, attackId, type = 'character', minionId = null) {
+            console.log('🔍 handleAttackNameInput called - input:', event.target.value);
+
             const input = event.target.value;
             const matches = findAttackMatches(input);
+
+            console.log('📋 Found', matches.length, 'matches');
 
             // Get or create dropdown
             let dropdown = event.target.nextElementSibling;
@@ -2265,9 +2269,12 @@
                 dropdown = document.createElement('div');
                 dropdown.className = 'autocomplete-dropdown';
                 event.target.parentNode.insertBefore(dropdown, event.target.nextSibling);
+                console.log('✅ Created new dropdown');
             }
 
             if (matches.length > 0 && input) {
+                console.log('🎯 Building dropdown with', matches.length, 'items');
+
                 // Clear previous content and event listeners
                 dropdown.innerHTML = '';
 
@@ -2287,17 +2294,26 @@
                     // Add click event listener directly - this is more reliable than inline onclick
                     item.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        console.log('Autocomplete clicked:', match.name);
+                        console.log('========================================');
+                        console.log('🎯 AUTOCOMPLETE CLICKED!');
+                        console.log('Attack name:', match.name);
+                        console.log('Attack ID:', attackId);
+                        console.log('Type:', type);
+                        console.log('Minion ID:', minionId);
+                        console.log('========================================');
                         selectAutocomplete(match.name, attackId, type, minionId);
                     });
 
                     dropdown.appendChild(item);
+                    console.log('  ➕ Added item:', match.name);
                 });
 
                 dropdown.style.display = 'block';
                 activeAutocompleteInput = event.target;
+                console.log('✅ Dropdown displayed');
             } else {
                 dropdown.style.display = 'none';
+                console.log('❌ No matches or empty input');
             }
         }
 
