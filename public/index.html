@@ -500,6 +500,22 @@
             align-items: end;
         }
 
+        .damage-component-header {
+            display: grid;
+            grid-template-columns: 55px 50px 90px auto;
+            gap: 4px;
+            margin-bottom: 2px;
+            padding: 2px;
+        }
+
+        .damage-component-header label {
+            font-size: 7px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
         /* Compact attack grid for better density */
         .attack-grid {
             display: grid;
@@ -2479,6 +2495,14 @@
                         <span>Damage</span>
                         <button class="btn-primary btn-small" onclick="addDamageComponent(${attack.id}, '${attackType}', ${minionId})">+ Add</button>
                     </h4>
+                    ${attack.damageComponents.length > 0 ? `
+                        <div class="damage-component-header">
+                            <label>Dice</label>
+                            <label>Bonus</label>
+                            <label>Type</label>
+                            <label></label>
+                        </div>
+                    ` : ''}
                     ${attack.damageComponents.map(comp => `
                         <div class="damage-component">
                             <input type="text"
