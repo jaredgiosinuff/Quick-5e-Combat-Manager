@@ -939,7 +939,7 @@
 
                 <div id="minions"></div>
 
-                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addMinion()">➕ Add Group</button>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addMinion()">➕ Add Minion</button>
             </div>
 
             <!-- Combat Log -->
@@ -2649,6 +2649,29 @@
             saveState();
         }
 
+        function duplicateMinion(id) {
+            const minion = minions.find(m => m.id === id);
+            if (minion) {
+                const newMinion = {
+                    id: minionIdCounter++,
+                    name: minion.name + ' (Copy)',
+                    attacks: minion.attacks.map(attack => ({
+                        ...attack,
+                        id: attackIdCounter++,
+                        selected: false,
+                        expanded: false,
+                        damageComponents: attack.damageComponents.map(c => ({
+                            ...c,
+                            id: damageComponentIdCounter++
+                        }))
+                    }))
+                };
+                minions.push(newMinion);
+                renderMinions();
+                saveState();
+            }
+        }
+
         function updateMinion(id, field, value) {
             const minion = minions.find(m => m.id === id);
             if (minion) {
@@ -2801,7 +2824,7 @@
         function renderMinions() {
             const container = document.getElementById('minions');
             if (minions.length === 0) {
-                container.innerHTML = '<p class="empty-state">No minion groups yet</p>';
+                container.innerHTML = '<p class="empty-state">No minions yet</p>';
                 return;
             }
 
@@ -2809,7 +2832,7 @@
                 <div class="minion-item">
                     <input type="text"
                            value="${minion.name}"
-                           placeholder="Group Name"
+                           placeholder="Minion Name"
                            style="margin-bottom: 8px; font-weight: bold;"
                            onchange="updateMinion(${minion.id}, 'name', this.value)">
 
@@ -2934,7 +2957,8 @@
 
                     <div style="margin-top: 8px; display: flex; gap: 6px;">
                         <button class="btn-primary btn-small" style="flex: 1;" onclick="addMinionAttack(${minion.id})">+ Attack</button>
-                        <button class="btn-danger btn-small" onclick="removeMinion(${minion.id})">Remove Group</button>
+                        <button class="btn-secondary btn-small" onclick="duplicateMinion(${minion.id})">📋 Duplicate</button>
+                        <button class="btn-danger btn-small" onclick="removeMinion(${minion.id})">Remove</button>
                     </div>
                 </div>
             `).join('');
