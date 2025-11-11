@@ -1999,9 +1999,29 @@
         // ========================================
 
         function toggleExpand(attackId, type = 'character') {
-            const element = document.querySelector(`[data-attack-id="${attackId}"]`);
-            if (element) {
-                element.classList.toggle('expanded');
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.expanded = !attack.expanded;
+                    const element = document.querySelector(`[data-attack-id="${attackId}"]`);
+                    if (element) {
+                        element.classList.toggle('expanded');
+                    }
+                    saveState();
+                }
+            } else {
+                // For minions, need to find the right minion
+                minions.forEach(minion => {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        attack.expanded = !attack.expanded;
+                        const element = document.querySelector(`[data-attack-id="${attackId}"]`);
+                        if (element) {
+                            element.classList.toggle('expanded');
+                        }
+                        saveState();
+                    }
+                });
             }
         }
 
@@ -2439,7 +2459,7 @@
                 advantage: 'normal',
                 rollCount: 1,
                 selected: false,
-                expanded: false
+                expanded: true
             };
             characterAttacks.push(attack);
             renderCharacterAttacks();
@@ -2708,7 +2728,7 @@
                         advantage: 'normal',
                         rollCount: 1,
                         selected: false,
-                        expanded: false
+                        expanded: true
                     };
                     minion.attacks.push(attack);
                 }
