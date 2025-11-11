@@ -591,6 +591,26 @@
             renderMinions();
         }
 
+        function duplicateMinion(id) {
+            const minion = minions.find(m => m.id === id);
+            if (minion) {
+                const newMinion = {
+                    id: minionIdCounter++,
+                    name: minion.name + ' (Copy)',
+                    attacks: minion.attacks.map(attack => ({
+                        id: attackIdCounter++,
+                        name: attack.name,
+                        attackBonus: attack.attackBonus,
+                        damageComponents: attack.damageComponents.map(dc => ({ ...dc })),
+                        saveDC: attack.saveDC,
+                        saveType: attack.saveType
+                    }))
+                };
+                minions.push(newMinion);
+                renderMinions();
+            }
+        }
+
         function addMinionAttack(minionId) {
             const minion = minions.find(m => m.id === minionId);
             if (minion) {
@@ -598,12 +618,65 @@
                     id: attackIdCounter++,
                     name: '',
                     attackBonus: 0,
-                    damage: '1d6',
+                    damageComponents: [
+                        { dice: '1d6', type: 'slashing' }
+                    ],
                     saveDC: 0,
                     saveType: 'DEX'
                 };
                 minion.attacks.push(attack);
                 renderMinions();
+            }
+        }
+
+        function duplicateMinionAttack(minionId, attackId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack) {
+                    const newAttack = {
+                        id: attackIdCounter++,
+                        name: attack.name + ' (Copy)',
+                        attackBonus: attack.attackBonus,
+                        damageComponents: attack.damageComponents.map(dc => ({ ...dc })),
+                        saveDC: attack.saveDC,
+                        saveType: attack.saveType
+                    };
+                    minion.attacks.push(newAttack);
+                    renderMinions();
+                }
+            }
+        }
+
+        function addDamageComponent(minionId, attackId) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.damageComponents.push({ dice: '1d6', type: 'slashing' });
+                    renderMinions();
+                }
+            }
+        }
+
+        function removeDamageComponent(minionId, attackId, index) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack && attack.damageComponents.length > 1) {
+                    attack.damageComponents.splice(index, 1);
+                    renderMinions();
+                }
+            }
+        }
+
+        function updateDamageComponent(minionId, attackId, index, field, value) {
+            const minion = minions.find(m => m.id === minionId);
+            if (minion) {
+                const attack = minion.attacks.find(a => a.id === attackId);
+                if (attack && attack.damageComponents[index]) {
+                    attack.damageComponents[index][field] = value;
+                }
             }
         }
 
@@ -647,20 +720,26 @@
                                placeholder="Minion Name"
                                value="${minion.name}"
                                onchange="updateMinion(${minion.id}, 'name', this.value)"
-                               style="border: none; background: transparent; width: 70%;">
-                        <button class="btn btn-danger btn-small" onclick="removeMinion(${minion.id})">Remove</button>
+                               style="border: none; background: transparent; width: 50%;">
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn btn-secondary btn-small" onclick="duplicateMinion(${minion.id})">Duplicate</button>
+                            <button class="btn btn-danger btn-small" onclick="removeMinion(${minion.id})">Remove</button>
+                        </div>
                     </div>
 
                     <div>
                         ${minion.attacks.map(attack => `
-                            <div class="attack-item" style="margin-top: 10px;">
+                            <div class="attack-item" style="margin-top: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
                                 <div class="attack-header">
                                     <input type="text"
                                            placeholder="Attack Name"
                                            value="${attack.name}"
                                            onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'name', this.value)"
-                                           style="border: none; background: transparent; font-size: 16px; font-weight: bold; width: 70%;">
-                                    <button class="btn btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})">Remove</button>
+                                           style="border: none; background: transparent; font-size: 16px; font-weight: bold; width: 50%;">
+                                    <div style="display: flex; gap: 5px;">
+                                        <button class="btn btn-secondary btn-small" onclick="duplicateMinionAttack(${minion.id}, ${attack.id})">Duplicate</button>
+                                        <button class="btn btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})">Remove</button>
+                                    </div>
                                 </div>
                                 <div class="attack-controls">
                                     <div>
@@ -668,22 +747,14 @@
                                         <input type="number"
                                                value="${attack.attackBonus}"
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'attackBonus', parseInt(this.value))"
-                                               style="padding: 5px;">
-                                    </div>
-                                    <div>
-                                        <label style="font-size: 12px;">Damage</label>
-                                        <input type="text"
-                                               value="${attack.damage}"
-                                               placeholder="e.g., 2d6+3"
-                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'damage', this.value)"
-                                               style="padding: 5px;">
+                                               style="padding: 5px; width: 60px;">
                                     </div>
                                     <div>
                                         <label style="font-size: 12px;">Save DC</label>
                                         <input type="number"
                                                value="${attack.saveDC}"
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'saveDC', parseInt(this.value))"
-                                               style="padding: 5px;">
+                                               style="padding: 5px; width: 60px;">
                                     </div>
                                     <div>
                                         <label style="font-size: 12px;">Save Type</label>
@@ -697,6 +768,38 @@
                                             <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 5px;">Damage Components:</label>
+                                    ${attack.damageComponents.map((dc, index) => `
+                                        <div style="display: flex; gap: 5px; margin-bottom: 5px; align-items: center;">
+                                            <input type="text"
+                                                   value="${dc.dice}"
+                                                   placeholder="e.g., 2d6+3"
+                                                   onchange="updateDamageComponent(${minion.id}, ${attack.id}, ${index}, 'dice', this.value)"
+                                                   style="padding: 5px; width: 100px;">
+                                            <select onchange="updateDamageComponent(${minion.id}, ${attack.id}, ${index}, 'type', this.value)"
+                                                    style="padding: 5px;">
+                                                <option value="slashing" ${dc.type === 'slashing' ? 'selected' : ''}>Slashing</option>
+                                                <option value="piercing" ${dc.type === 'piercing' ? 'selected' : ''}>Piercing</option>
+                                                <option value="bludgeoning" ${dc.type === 'bludgeoning' ? 'selected' : ''}>Bludgeoning</option>
+                                                <option value="fire" ${dc.type === 'fire' ? 'selected' : ''}>Fire</option>
+                                                <option value="cold" ${dc.type === 'cold' ? 'selected' : ''}>Cold</option>
+                                                <option value="lightning" ${dc.type === 'lightning' ? 'selected' : ''}>Lightning</option>
+                                                <option value="acid" ${dc.type === 'acid' ? 'selected' : ''}>Acid</option>
+                                                <option value="poison" ${dc.type === 'poison' ? 'selected' : ''}>Poison</option>
+                                                <option value="psychic" ${dc.type === 'psychic' ? 'selected' : ''}>Psychic</option>
+                                                <option value="necrotic" ${dc.type === 'necrotic' ? 'selected' : ''}>Necrotic</option>
+                                                <option value="radiant" ${dc.type === 'radiant' ? 'selected' : ''}>Radiant</option>
+                                                <option value="force" ${dc.type === 'force' ? 'selected' : ''}>Force</option>
+                                                <option value="thunder" ${dc.type === 'thunder' ? 'selected' : ''}>Thunder</option>
+                                            </select>
+                                            ${attack.damageComponents.length > 1 ? `
+                                                <button class="btn btn-danger btn-small" onclick="removeDamageComponent(${minion.id}, ${attack.id}, ${index})" style="padding: 3px 8px;">×</button>
+                                            ` : ''}
+                                        </div>
+                                    `).join('')}
+                                    <button class="btn btn-success btn-small" onclick="addDamageComponent(${minion.id}, ${attack.id})" style="margin-top: 5px; padding: 3px 8px; font-size: 12px;">+ Add Damage</button>
                                 </div>
                                 <div class="advantage-selector">
                                     <label>
@@ -742,7 +845,11 @@
                 attackRoll = rollNormal(attack.attackBonus);
             }
 
-            const damageRoll = rollDice(attack.damage);
+            // Roll all damage components
+            const damageRolls = attack.damageComponents.map(dc => ({
+                roll: rollDice(dc.dice),
+                type: dc.type
+            }));
 
             let resultClass = '';
             if (attackRoll.chosen === 20) resultClass = 'critical-success';
@@ -764,19 +871,35 @@
                     </div>
             `;
 
-            if (damageRoll) {
+            // Display all damage components
+            if (damageRolls.length > 0 && damageRolls[0].roll) {
                 const isCrit = attackRoll.chosen === 20;
-                const finalDamage = isCrit ? damageRoll.total * 2 : damageRoll.total;
+                let totalDamage = 0;
 
-                resultHTML += `
-                    <div class="result-details">
-                        <strong>Damage:</strong>
-                        ${damageRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}
-                        ${damageRoll.modifier !== 0 ? ` + ${damageRoll.modifier}` : ''}
-                        = <strong>${finalDamage}</strong>
-                        ${isCrit ? ' (Doubled for crit!)' : ''}
-                    </div>
-                `;
+                damageRolls.forEach(({ roll, type }) => {
+                    if (roll) {
+                        const componentDamage = isCrit ? roll.total * 2 : roll.total;
+                        totalDamage += componentDamage;
+
+                        resultHTML += `
+                            <div class="result-details">
+                                <strong>${type.charAt(0).toUpperCase() + type.slice(1)} Damage:</strong>
+                                ${roll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}
+                                ${roll.modifier !== 0 ? ` + ${roll.modifier}` : ''}
+                                = <strong>${componentDamage}</strong>
+                                ${isCrit ? ' (Doubled for crit!)' : ''}
+                            </div>
+                        `;
+                    }
+                });
+
+                if (damageRolls.length > 1) {
+                    resultHTML += `
+                        <div class="result-details">
+                            <strong>Total Damage:</strong> <strong>${totalDamage}</strong>
+                        </div>
+                    `;
+                }
             }
 
             if (attack.saveDC > 0) {
