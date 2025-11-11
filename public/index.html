@@ -678,81 +678,6 @@
             }
         }
 
-        .target-item {
-            background: #f5f5f5;
-            border: 2px solid #9e9e9e;
-            border-radius: 6px;
-            padding: 8px;
-            margin-bottom: 8px;
-            transition: all 0.2s;
-        }
-
-        .target-item.bloodied {
-            border-color: #ff9800;
-            background: #fff3e0;
-        }
-
-        .target-item.dying {
-            border-color: #f44336;
-            background: #ffebee;
-        }
-
-        .target-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .target-name {
-            font-weight: bold;
-            font-size: 13px;
-            color: #2a5298;
-        }
-
-        .target-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            font-size: 11px;
-        }
-
-        .hp-bar-container {
-            grid-column: 1 / -1;
-            background: #e0e0e0;
-            border-radius: 10px;
-            height: 16px;
-            overflow: hidden;
-            position: relative;
-            margin: 6px 0;
-        }
-
-        .hp-bar {
-            background: linear-gradient(90deg, #4caf50, #8bc34a);
-            height: 100%;
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .hp-bar.bloodied {
-            background: linear-gradient(90deg, #ff9800, #ffc107);
-        }
-
-        .hp-bar.dying {
-            background: linear-gradient(90deg, #f44336, #e57373);
-        }
-
-        .target-actions {
-            display: flex;
-            gap: 4px;
-            margin-top: 6px;
-        }
-
         .floating-action-btn {
             position: fixed;
             bottom: 20px;
@@ -828,22 +753,6 @@
         .template-item:hover {
             background: #e3f2fd;
             border-color: #2a5298;
-        }
-
-        .conditions-badges {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            margin-top: 4px;
-        }
-
-        .condition-badge {
-            font-size: 9px;
-            padding: 2px 5px;
-            border-radius: 3px;
-            background: #9c27b0;
-            color: white;
-            font-weight: bold;
         }
 
         @media (max-width: 768px) {
@@ -1035,15 +944,6 @@
                 <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addMinion()">➕ Add Group</button>
             </div>
 
-            <!-- Targets Section -->
-            <div class="card">
-                <h2>🎯 Targets</h2>
-
-                <div id="targets"></div>
-
-                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addTarget()">➕ Add Target</button>
-            </div>
-
             <!-- Combat Log -->
             <div class="card combat-log-card">
                 <div class="log-header">
@@ -1144,19 +1044,15 @@
         let characterName = '';
         let characterAttacks = [];
         let minions = [];
-        let targets = [];
         let combatLog = [];
         let initiative = [];
         let currentTurn = 0;
         let attackTemplates = [];
         let lastRollConfig = null;
-        let lastDamageRoll = null;
-        let selectedTarget = null;
         let history = [];
         let historyIndex = -1;
         let attackIdCounter = 0;
         let minionIdCounter = 0;
-        let targetIdCounter = 0;
         let damageComponentIdCounter = 0;
         let displayMode = 'emoji'; // 'emoji' or 'text'
         let currentRuleset = '5e2014'; // '5e2014', '5e2024', 'tov', 'deepmagic'
@@ -3048,174 +2944,8 @@
         }
 
         // ========================================
-        // TARGET MANAGEMENT FUNCTIONS
+        // LOGGING FUNCTIONS
         // ========================================
-
-        function addTarget() {
-            const target = {
-                id: targetIdCounter++,
-                name: 'Target',
-                currentHP: 20,
-                maxHP: 20,
-                ac: 15,
-                initiative: 10,
-                resistances: [],
-                vulnerabilities: [],
-                immunities: [],
-                conditions: []
-            };
-            targets.push(target);
-            renderTargets();
-            saveState();
-        }
-
-        function removeTarget(id) {
-            targets = targets.filter(t => t.id !== id);
-            if (selectedTarget === id) selectedTarget = null;
-            renderTargets();
-            saveState();
-        }
-
-        function updateTarget(id, field, value) {
-            const target = targets.find(t => t.id === id);
-            if (target) {
-                target[field] = value;
-                renderTargets();
-                saveState();
-            }
-        }
-
-        function applyDamage(targetId, amount, damageType = 'normal') {
-            const target = targets.find(t => t.id === targetId);
-            if (!target) return;
-
-            let finalDamage = amount;
-
-            // Apply resistance/vulnerability/immunity
-            if (target.immunities.includes(damageType)) {
-                finalDamage = 0;
-            } else if (target.resistances.includes(damageType)) {
-                finalDamage = Math.floor(amount / 2);
-            } else if (target.vulnerabilities.includes(damageType)) {
-                finalDamage = amount * 2;
-            }
-
-            target.currentHP = Math.max(0, target.currentHP - finalDamage);
-            renderTargets();
-            saveState();
-
-            // Log the damage
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = {
-                timestamp,
-                targetName: target.name,
-                damage: finalDamage,
-                damageType,
-                newHP: target.currentHP
-            };
-            addToLog(`[${timestamp}] ${target.name} takes ${finalDamage} ${damageType} damage → ${target.currentHP}/${target.maxHP} HP`);
-        }
-
-        function healTarget(targetId, amount) {
-            const target = targets.find(t => t.id === targetId);
-            if (!target) return;
-
-            target.currentHP = Math.min(target.maxHP, target.currentHP + amount);
-            renderTargets();
-            saveState();
-
-            const timestamp = new Date().toLocaleTimeString();
-            addToLog(`[${timestamp}] ${target.name} heals ${amount} HP → ${target.currentHP}/${target.maxHP} HP`);
-        }
-
-        function selectTargetForDamage(targetId) {
-            selectedTarget = targetId;
-            renderTargets();
-        }
-
-        function renderTargets() {
-            const container = document.getElementById('targets');
-            if (targets.length === 0) {
-                container.innerHTML = '<p class="empty-state">No targets yet</p>';
-                return;
-            }
-
-            container.innerHTML = targets.map(target => {
-                const hpPercent = (target.currentHP / target.maxHP) * 100;
-                let hpClass = '';
-                let targetClass = '';
-                if (hpPercent <= 0) {
-                    hpClass = 'dying';
-                    targetClass = 'dying';
-                } else if (hpPercent <= 50) {
-                    hpClass = 'bloodied';
-                    targetClass = 'bloodied';
-                }
-
-                const isSelected = selectedTarget === target.id;
-
-                return `
-                    <div class="target-item ${targetClass} ${isSelected ? 'selected' : ''}" data-target-id="${target.id}">
-                        <div class="target-header">
-                            <input type="text"
-                                   value="${target.name}"
-                                   style="font-weight: bold; font-size: 13px; border: none; background: transparent; width: 100%;"
-                                   onchange="updateTarget(${target.id}, 'name', this.value)">
-                            <button class="btn-danger btn-small" onclick="removeTarget(${target.id})">×</button>
-                        </div>
-
-                        <div class="hp-bar-container">
-                            <div class="hp-bar ${hpClass}" style="width: ${hpPercent}%">
-                                ${target.currentHP}/${target.maxHP}
-                            </div>
-                        </div>
-
-                        <div class="target-stats">
-                            <div>
-                                <strong>AC:</strong>
-                                <input type="number" value="${target.ac}" style="width: 50px;" onchange="updateTarget(${target.id}, 'ac', parseInt(this.value))">
-                            </div>
-                            <div>
-                                <strong>Init:</strong>
-                                <input type="number" value="${target.initiative}" style="width: 50px;" onchange="updateTarget(${target.id}, 'initiative', parseInt(this.value))">
-                            </div>
-                            <div>
-                                <strong>Current HP:</strong>
-                                <input type="number" value="${target.currentHP}" style="width: 50px;" onchange="updateTarget(${target.id}, 'currentHP', parseInt(this.value))">
-                            </div>
-                            <div>
-                                <strong>Max HP:</strong>
-                                <input type="number" value="${target.maxHP}" style="width: 50px;" onchange="updateTarget(${target.id}, 'maxHP', parseInt(this.value))">
-                            </div>
-                        </div>
-
-                        <div class="target-actions">
-                            <button class="btn-danger btn-small" onclick="applyDamagePrompt(${target.id})">💥 Damage</button>
-                            <button class="btn-success btn-small" onclick="healPrompt(${target.id})">💚 Heal</button>
-                            <button class="btn-info btn-small" onclick="selectTargetForDamage(${target.id})">${isSelected ? '✓ Selected' : 'Select'}</button>
-                        </div>
-
-                        ${target.conditions.length > 0 ? `
-                            <div class="conditions-badges">
-                                ${target.conditions.map(c => `<span class="condition-badge">${c}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function applyDamagePrompt(targetId) {
-            const amount = prompt('Damage amount:', lastDamageRoll ? lastDamageRoll.toString() : '10');
-            if (amount === null || isNaN(amount)) return;
-            applyDamage(targetId, parseInt(amount), 'normal');
-        }
-
-        function healPrompt(targetId) {
-            const amount = prompt('Heal amount:', '10');
-            if (amount === null || isNaN(amount)) return;
-            healTarget(targetId, parseInt(amount));
-        }
 
         function addToLog(message) {
             const resultsContainer = document.getElementById('results');
@@ -3254,16 +2984,6 @@
                         initiative: roll,
                         type: 'minion'
                     });
-                });
-            });
-
-            // Add targets
-            targets.forEach(target => {
-                initiative.push({
-                    name: target.name,
-                    initiative: target.initiative + rollDie(20),
-                    type: 'target',
-                    targetId: target.id
                 });
             });
 
@@ -3559,28 +3279,6 @@
 
             const totalDamage = damageResults.reduce((sum, dr) => sum + dr.total, 0);
 
-            // Track last damage for quick application
-            lastDamageRoll = totalDamage;
-
-            // Check against selected target
-            let hitStatus = null;
-            let targetAC = null;
-            if (selectedTarget) {
-                const target = targets.find(t => t.id === selectedTarget);
-                if (target) {
-                    targetAC = target.ac;
-                    if (isCrit) {
-                        hitStatus = 'CRITICAL HIT';
-                    } else if (isFumble) {
-                        hitStatus = 'MISS';
-                    } else if (attackRoll.total >= target.ac) {
-                        hitStatus = 'HIT';
-                    } else {
-                        hitStatus = 'MISS';
-                    }
-                }
-            }
-
             const timestamp = new Date().toLocaleTimeString();
 
             return {
@@ -3594,9 +3292,7 @@
                 isCrit,
                 isFumble,
                 saveDC: attack.saveDC,
-                saveType: attack.saveType,
-                hitStatus,
-                targetAC
+                saveType: attack.saveType
             };
         }
 
@@ -3646,20 +3342,11 @@
                 isCrit,
                 isFumble,
                 saveDC,
-                saveType,
-                hitStatus,
-                targetAC
+                saveType
             } = resultData;
 
             const resultClass = isCrit ? 'critical-success' : isFumble ? 'critical-failure' : '';
             const critText = isCrit ? ' 🎯 CRIT!' : isFumble ? ' 💥 MISS!' : '';
-
-            // Hit/Miss status display
-            let hitStatusDisplay = '';
-            if (hitStatus) {
-                const statusColor = hitStatus === 'MISS' ? '#f44336' : hitStatus === 'CRITICAL HIT' ? '#ffc107' : '#4caf50';
-                hitStatusDisplay = `<span style="color: ${statusColor}; font-weight: bold; margin-left: 8px;">${hitStatus} ${targetAC ? `(AC ${targetAC})` : ''}</span>`;
-            }
 
             const attackRollDisplay = attackRoll.rolls.length > 1
                 ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
@@ -3683,11 +3370,6 @@
                 `;
             }).join('');
 
-            // Apply damage button if target is selected
-            const applyDamageBtn = selectedTarget && hitStatus && hitStatus !== 'MISS'
-                ? `<button class="btn-danger btn-small" style="margin-top: 6px;" onclick="applyDamage(${selectedTarget}, ${totalDamage}, 'normal')">💥 Apply ${totalDamage} Damage</button>`
-                : '';
-
             const html = `
                 <div class="result-item ${resultClass}">
                     <div class="result-header">
@@ -3695,13 +3377,12 @@
                         <span class="result-timestamp">${timestamp}</span>
                     </div>
                     <div class="result-detail">
-                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}${hitStatusDisplay}
+                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
                     </div>
                     <div class="damage-breakdown">
                         ${damageBreakdown}
                         <div class="damage-total">
                             TOTAL: ${totalDamage}${isCrit ? ' (x2)' : ''}
-                            ${applyDamageBtn}
                         </div>
                     </div>
                     ${saveDC > 0 ? `<div class="result-detail"><strong>Save:</strong> DC${saveDC} ${saveType}</div>` : ''}
@@ -3801,17 +3482,13 @@
                 characterName,
                 characterAttacks,
                 minions,
-                targets,
                 combatLog,
                 initiative,
                 currentTurn,
                 attackTemplates,
                 lastRollConfig,
-                lastDamageRoll,
-                selectedTarget,
                 attackIdCounter,
                 minionIdCounter,
-                targetIdCounter,
                 damageComponentIdCounter,
                 displayMode
             };
@@ -3826,17 +3503,13 @@
                     characterName = state.characterName || '';
                     characterAttacks = state.characterAttacks || [];
                     minions = state.minions || [];
-                    targets = state.targets || [];
                     combatLog = state.combatLog || [];
                     initiative = state.initiative || [];
                     currentTurn = state.currentTurn || 0;
                     attackTemplates = state.attackTemplates || [];
                     lastRollConfig = state.lastRollConfig || null;
-                    lastDamageRoll = state.lastDamageRoll || null;
-                    selectedTarget = state.selectedTarget || null;
                     attackIdCounter = state.attackIdCounter || 0;
                     minionIdCounter = state.minionIdCounter || 0;
-                    targetIdCounter = state.targetIdCounter || 0;
                     damageComponentIdCounter = state.damageComponentIdCounter || 0;
                     displayMode = state.displayMode || 'emoji';
 
@@ -3849,7 +3522,6 @@
                     document.getElementById('characterName').value = characterName;
                     renderCharacterAttacks();
                     renderMinions();
-                    renderTargets();
                     renderInitiative();
 
                     if (combatLog.length > 0) {
@@ -4036,9 +3708,6 @@ Tips:
             }
             if (minions.length === 0) {
                 renderMinions();
-            }
-            if (targets.length === 0) {
-                renderTargets();
             }
             if (initiative.length === 0) {
                 renderInitiative();
