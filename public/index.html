@@ -929,6 +929,20 @@
                 </div>
             </div>
 
+            <!-- Combat Log -->
+            <div class="card combat-log-card">
+                <div class="log-header">
+                    <h2>Combat Log</h2>
+                    <div class="log-controls">
+                        <button class="btn-warning btn-small" onclick="exportLog()">💾</button>
+                        <button class="btn-danger btn-small" onclick="clearResults()">🗑️</button>
+                    </div>
+                </div>
+                <div class="results-container" id="results">
+                    <div class="empty-state">No rolls yet. Select attacks and click Roll!</div>
+                </div>
+            </div>
+
             <!-- Minions Section -->
             <div class="card">
                 <h2>Minions</h2>
@@ -942,20 +956,6 @@
                 <div id="minions"></div>
 
                 <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addMinion()">➕ Add Group</button>
-            </div>
-
-            <!-- Combat Log -->
-            <div class="card combat-log-card">
-                <div class="log-header">
-                    <h2>Combat Log</h2>
-                    <div class="log-controls">
-                        <button class="btn-warning btn-small" onclick="exportLog()">💾</button>
-                        <button class="btn-danger btn-small" onclick="clearResults()">🗑️</button>
-                    </div>
-                </div>
-                <div class="results-container" id="results">
-                    <div class="empty-state">No rolls yet. Select attacks and click Roll!</div>
-                </div>
             </div>
         </div>
     </div>
