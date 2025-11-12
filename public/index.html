@@ -2471,7 +2471,8 @@
                 advantage: 'normal',
                 rollCount: 1,
                 selected: false,
-                expanded: true
+                expanded: true,
+                noAttackRoll: false
             };
             characterAttacks.push(attack);
             renderCharacterAttacks();
@@ -2764,24 +2765,34 @@
                                     <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
                                 </select>
                             </div>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 5px;">
+                                <label style="margin: 0;">
+                                    <input type="checkbox"
+                                           ${attack.noAttackRoll ? 'checked' : ''}
+                                           onchange="updateCharacterAttack(${attack.id}, 'noAttackRoll', this.checked)"
+                                           onclick="event.stopPropagation()"
+                                           title="No attack roll needed (auto-hit or saving throw only)">
+                                    No Attack Roll
+                                </label>
+                            </div>
                         </div>
 
                         ${renderDamageComponents(attack, 'character', null)}
 
                         <div class="advantage-selector" onclick="event.stopPropagation()">
-                            <label>
+                            <label title="Roll normally with one d20">
                                 <input type="radio" name="adv-${attack.id}" value="normal"
                                        ${attack.advantage === 'normal' ? 'checked' : ''}
                                        onchange="updateCharacterAttack(${attack.id}, 'advantage', 'normal')">
                                 Normal
                             </label>
-                            <label>
+                            <label title="Roll with advantage (roll two d20s, take the higher)">
                                 <input type="radio" name="adv-${attack.id}" value="advantage"
                                        ${attack.advantage === 'advantage' ? 'checked' : ''}
                                        onchange="updateCharacterAttack(${attack.id}, 'advantage', 'advantage')">
                                 Adv
                             </label>
-                            <label>
+                            <label title="Roll with disadvantage (roll two d20s, take the lower)">
                                 <input type="radio" name="adv-${attack.id}" value="disadvantage"
                                        ${attack.advantage === 'disadvantage' ? 'checked' : ''}
                                        onchange="updateCharacterAttack(${attack.id}, 'advantage', 'disadvantage')">
@@ -2885,7 +2896,8 @@
                         advantage: 'normal',
                         rollCount: 1,
                         selected: false,
-                        expanded: true
+                        expanded: true,
+                        noAttackRoll: false
                     };
                     minion.attacks.push(attack);
                 }
@@ -3092,24 +3104,34 @@
                                             <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
                                         </select>
                                     </div>
+                                    <div class="form-group" style="display: flex; align-items: center; gap: 5px;">
+                                        <label style="margin: 0;">
+                                            <input type="checkbox"
+                                                   ${attack.noAttackRoll ? 'checked' : ''}
+                                                   onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'noAttackRoll', this.checked)"
+                                                   onclick="event.stopPropagation()"
+                                                   title="No attack roll needed (auto-hit or saving throw only)">
+                                            No Attack Roll
+                                        </label>
+                                    </div>
                                 </div>
 
                                 ${renderDamageComponents(attack, 'minion', minion.id)}
 
                                 <div class="advantage-selector" onclick="event.stopPropagation()">
-                                    <label>
+                                    <label title="Roll normally with one d20">
                                         <input type="radio" name="adv-${minion.id}-${attack.id}" value="normal"
                                                ${attack.advantage === 'normal' ? 'checked' : ''}
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'normal')">
                                         Normal
                                     </label>
-                                    <label>
+                                    <label title="Roll with advantage (roll two d20s, take the higher)">
                                         <input type="radio" name="adv-${minion.id}-${attack.id}" value="advantage"
                                                ${attack.advantage === 'advantage' ? 'checked' : ''}
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'advantage')">
                                         Adv
                                     </label>
-                                    <label>
+                                    <label title="Roll with disadvantage (roll two d20s, take the lower)">
                                         <input type="radio" name="adv-${minion.id}-${attack.id}" value="disadvantage"
                                                ${attack.advantage === 'disadvantage' ? 'checked' : ''}
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'disadvantage')">
@@ -3438,20 +3460,27 @@
 
         function executeAttackRoll(attack, attackerName) {
             let attackRoll;
+            let isCrit = false;
+            let isFumble = false;
             const advantageText = attack.advantage === 'advantage' ? ' (Adv)' :
                                  attack.advantage === 'disadvantage' ? ' (Dis)' : '';
 
-            if (attack.advantage === 'advantage') {
-                attackRoll = rollWithAdvantage(attack.attackBonus);
-            } else if (attack.advantage === 'disadvantage') {
-                attackRoll = rollWithDisadvantage(attack.attackBonus);
+            // Check if attack has no attack roll (auto-hit or save-only)
+            if (attack.noAttackRoll) {
+                attackRoll = null;
             } else {
-                attackRoll = rollNormal(attack.attackBonus);
+                if (attack.advantage === 'advantage') {
+                    attackRoll = rollWithAdvantage(attack.attackBonus);
+                } else if (attack.advantage === 'disadvantage') {
+                    attackRoll = rollWithDisadvantage(attack.attackBonus);
+                } else {
+                    attackRoll = rollNormal(attack.attackBonus);
+                }
+                isCrit = attackRoll.natural === 20;
+                isFumble = attackRoll.natural === 1;
             }
 
             const damageRoll = rollDice(attack.damage || '');
-            const isCrit = attackRoll.natural === 20;
-            const isFumble = attackRoll.natural === 1;
 
             // Roll damage for each component
             const damageResults = attack.damageComponents.map(comp => {
@@ -3543,9 +3572,11 @@
             const resultClass = isCrit ? 'critical-success' : isFumble ? 'critical-failure' : '';
             const critText = isCrit ? ' 🎯 CRIT!' : isFumble ? ' 💥 MISS!' : '';
 
-            const attackRollDisplay = attackRoll.rolls.length > 1
-                ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
-                : `<span class="dice-result">${attackRoll.rolls[0]}</span>`;
+            const attackRollDisplay = attackRoll
+                ? (attackRoll.rolls.length > 1
+                    ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
+                    : `<span class="dice-result">${attackRoll.rolls[0]}</span>`)
+                : null;
 
             const damageBreakdown = damageResults.map(dr => {
                 const rollsDisplay = dr.rolls.length > 0
@@ -3571,9 +3602,11 @@
                         <span>${attackerName} - ${attackName}${advantageText}</span>
                         <span class="result-timestamp">${timestamp}</span>
                     </div>
-                    <div class="result-detail">
-                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
-                    </div>
+                    ${attackRoll ? `
+                        <div class="result-detail">
+                            <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
+                        </div>
+                    ` : ''}
                     <div class="damage-breakdown">
                         ${damageBreakdown}
                         <div class="damage-total">
@@ -3776,9 +3809,11 @@
                         <span>${attackerName} - ${attackName}${advantageText}</span>
                         <span class="result-timestamp">${timestamp}</span>
                     </div>
-                    <div class="result-detail">
-                        <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
-                    </div>
+                    ${attackRoll ? `
+                        <div class="result-detail">
+                            <strong>Hit:</strong> ${attackRollDisplay} +${attackRoll.total - attackRoll.selected} = <strong>${attackRoll.total}</strong>${critText}
+                        </div>
+                    ` : ''}
                     <div class="damage-breakdown">
                         ${damageBreakdown}
                         <div class="damage-total">
