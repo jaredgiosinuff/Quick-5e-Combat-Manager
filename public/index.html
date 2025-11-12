@@ -2151,6 +2151,11 @@
                     attack.saveDC = template.saveDC;
                     attack.saveType = template.saveType;
 
+                    // Auto-select 'none' for attacks with saving throws (no attack roll)
+                    if (template.saveDC > 0) {
+                        attack.advantage = 'none';
+                    }
+
                     // Clone damage components with new IDs
                     attack.damageComponents = template.damageComponents.map(comp => ({
                         id: damageComponentIdCounter++,
@@ -2177,6 +2182,11 @@
                         attack.attackBonus = template.attackBonus;
                         attack.saveDC = template.saveDC;
                         attack.saveType = template.saveType;
+
+                        // Auto-select 'none' for attacks with saving throws (no attack roll)
+                        if (template.saveDC > 0) {
+                            attack.advantage = 'none';
+                        }
 
                         // Clone damage components with new IDs
                         attack.damageComponents = template.damageComponents.map(comp => ({
@@ -2765,16 +2775,6 @@
                                     <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
                                 </select>
                             </div>
-                            <div class="form-group" style="display: flex; align-items: center; gap: 5px;">
-                                <label style="margin: 0;">
-                                    <input type="checkbox"
-                                           ${attack.noAttackRoll ? 'checked' : ''}
-                                           onchange="updateCharacterAttack(${attack.id}, 'noAttackRoll', this.checked)"
-                                           onclick="event.stopPropagation()"
-                                           title="No attack roll needed (auto-hit or saving throw only)">
-                                    No Attack Roll
-                                </label>
-                            </div>
                         </div>
 
                         ${renderDamageComponents(attack, 'character', null)}
@@ -2797,6 +2797,12 @@
                                        ${attack.advantage === 'disadvantage' ? 'checked' : ''}
                                        onchange="updateCharacterAttack(${attack.id}, 'advantage', 'disadvantage')">
                                 Dis
+                            </label>
+                            <label title="No attack roll needed (auto-hit or saving throw only)">
+                                <input type="radio" name="adv-${attack.id}" value="none"
+                                       ${attack.advantage === 'none' ? 'checked' : ''}
+                                       onchange="updateCharacterAttack(${attack.id}, 'advantage', 'none')">
+                                None
                             </label>
                         </div>
 
@@ -3104,16 +3110,6 @@
                                             <option value="CHA" ${attack.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
                                         </select>
                                     </div>
-                                    <div class="form-group" style="display: flex; align-items: center; gap: 5px;">
-                                        <label style="margin: 0;">
-                                            <input type="checkbox"
-                                                   ${attack.noAttackRoll ? 'checked' : ''}
-                                                   onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'noAttackRoll', this.checked)"
-                                                   onclick="event.stopPropagation()"
-                                                   title="No attack roll needed (auto-hit or saving throw only)">
-                                            No Attack Roll
-                                        </label>
-                                    </div>
                                 </div>
 
                                 ${renderDamageComponents(attack, 'minion', minion.id)}
@@ -3136,6 +3132,12 @@
                                                ${attack.advantage === 'disadvantage' ? 'checked' : ''}
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'disadvantage')">
                                         Dis
+                                    </label>
+                                    <label title="No attack roll needed (auto-hit or saving throw only)">
+                                        <input type="radio" name="adv-${minion.id}-${attack.id}" value="none"
+                                               ${attack.advantage === 'none' ? 'checked' : ''}
+                                               onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'none')">
+                                        None
                                     </label>
                                 </div>
 
