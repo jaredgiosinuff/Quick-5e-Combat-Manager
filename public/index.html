@@ -2151,6 +2151,11 @@
                     attack.saveDC = template.saveDC;
                     attack.saveType = template.saveType;
 
+                    // Auto-select 'none' for attacks with saving throws (no attack roll)
+                    if (template.saveDC > 0) {
+                        attack.advantage = 'none';
+                    }
+
                     // Clone damage components with new IDs
                     attack.damageComponents = template.damageComponents.map(comp => ({
                         id: damageComponentIdCounter++,
@@ -2177,6 +2182,11 @@
                         attack.attackBonus = template.attackBonus;
                         attack.saveDC = template.saveDC;
                         attack.saveType = template.saveType;
+
+                        // Auto-select 'none' for attacks with saving throws (no attack roll)
+                        if (template.saveDC > 0) {
+                            attack.advantage = 'none';
+                        }
 
                         // Clone damage components with new IDs
                         attack.damageComponents = template.damageComponents.map(comp => ({
