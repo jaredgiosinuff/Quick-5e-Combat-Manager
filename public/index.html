@@ -882,9 +882,9 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h2 style="margin: 0; border: none; padding: 0;">⚡ Initiative</h2>
                 <div style="display: flex; gap: 5px;">
-                    <button class="btn-success btn-small" onclick="rollInitiative()">Roll Init</button>
-                    <button class="btn-primary btn-small" onclick="nextTurn()">Next →</button>
-                    <button class="btn-secondary btn-small" onclick="clearInitiative()">Clear</button>
+                    <button class="btn-success btn-small" onclick="rollInitiative()" title="Roll initiative for all character attacks and minions">Roll Init</button>
+                    <button class="btn-primary btn-small" onclick="nextTurn()" title="Advance to next turn in initiative order">Next →</button>
+                    <button class="btn-secondary btn-small" onclick="clearInitiative()" title="Clear initiative tracker">Clear</button>
                 </div>
             </div>
             <div class="initiative-list" id="initiativeList">
@@ -903,31 +903,31 @@
                 </div>
 
                 <div class="batch-controls">
-                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('character')" style="flex: 1;" id="charRollBtn">🎲 Roll</button>
-                    <button class="btn-info" onclick="repeatLastRoll()">🔄</button>
-                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', true)">All</button>
-                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', false)">None</button>
+                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('character')" style="flex: 1;" id="charRollBtn" title="Roll all selected character attacks">🎲 Roll</button>
+                    <button class="btn-info" onclick="repeatLastRoll()" title="Repeat the last roll">🔄</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', true)" title="Select all character attacks">All</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('character', false)" title="Deselect all character attacks">None</button>
                 </div>
 
                 <div id="characterAttacks"></div>
 
                 <div style="display: flex; gap: 5px; margin-top: 10px;">
-                    <button class="btn-primary" style="flex: 1;" onclick="addCharacterAttack()">➕ Add Attack</button>
-                    <button class="btn-info btn-small" onclick="exportCharacter()">💾</button>
-                    <button class="btn-warning btn-small" onclick="importCharacter()">📥</button>
-                    <button class="btn-danger btn-small" onclick="clearCharacter()">🗑️</button>
+                    <button class="btn-primary" style="flex: 1;" onclick="addCharacterAttack()" title="Add a new attack">➕ Add Attack</button>
+                    <button class="btn-info btn-small" onclick="exportCharacter()" title="Export character to JSON file">💾</button>
+                    <button class="btn-warning btn-small" onclick="importCharacter()" title="Import character from JSON file">📥</button>
+                    <button class="btn-danger btn-small" onclick="clearCharacter()" title="Clear all character data">🗑️</button>
                 </div>
 
                 <div class="quick-dice-roller">
                     <h3>Quick Roll</h3>
                     <div class="dice-buttons">
-                        <button class="btn-info btn-small" onclick="rollQuickDice('d4')">d4</button>
-                        <button class="btn-info btn-small" onclick="rollQuickDice('d6')">d6</button>
-                        <button class="btn-info btn-small" onclick="rollQuickDice('d8')">d8</button>
-                        <button class="btn-info btn-small" onclick="rollQuickDice('d10')">d10</button>
-                        <button class="btn-info btn-small" onclick="rollQuickDice('d12')">d12</button>
-                        <button class="btn-info btn-small" onclick="rollQuickDice('d20')">d20</button>
-                        <button class="btn-info btn-small" onclick="rollQuickDice('d100')">d100</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d4')" title="Roll a d4">d4</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d6')" title="Roll a d6">d6</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d8')" title="Roll a d8">d8</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d10')" title="Roll a d10">d10</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d12')" title="Roll a d12">d12</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d20')" title="Roll a d20">d20</button>
+                        <button class="btn-info btn-small" onclick="rollQuickDice('d100')" title="Roll a d100">d100</button>
                     </div>
                 </div>
             </div>
@@ -937,18 +937,18 @@
                 <h2>Minions</h2>
 
                 <div class="batch-controls">
-                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('minions')" style="flex: 1;" id="minionRollBtn">🎲 Roll</button>
-                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', true)">All</button>
-                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', false)">None</button>
+                    <button class="btn-success btn-large" onclick="rollSelectedAttacks('minions')" style="flex: 1;" id="minionRollBtn" title="Roll all selected minion attacks">🎲 Roll</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', true)" title="Select all minion attacks">All</button>
+                    <button class="btn-secondary btn-small" onclick="selectAllAttacks('minions', false)" title="Deselect all minion attacks">None</button>
                 </div>
 
                 <div id="minions"></div>
 
                 <div style="display: flex; gap: 5px; margin-top: 10px;">
-                    <button class="btn-primary" style="flex: 1;" onclick="addMinion()">➕ Add Minion</button>
-                    <button class="btn-info btn-small" onclick="exportMinions()">💾</button>
-                    <button class="btn-warning btn-small" onclick="importMinions()">📥</button>
-                    <button class="btn-danger btn-small" onclick="clearMinions()">🗑️</button>
+                    <button class="btn-primary" style="flex: 1;" onclick="addMinion()" title="Add a new minion">➕ Add Minion</button>
+                    <button class="btn-info btn-small" onclick="exportMinions()" title="Export all minions to JSON file">💾</button>
+                    <button class="btn-warning btn-small" onclick="importMinions()" title="Import minions from JSON file">📥</button>
+                    <button class="btn-danger btn-small" onclick="clearMinions()" title="Clear all minions">🗑️</button>
                 </div>
             </div>
 
@@ -957,8 +957,8 @@
                 <div class="log-header">
                     <h2>Combat Log</h2>
                     <div class="log-controls">
-                        <button class="btn-warning btn-small" onclick="exportLog()">💾</button>
-                        <button class="btn-danger btn-small" onclick="clearResults()">🗑️</button>
+                        <button class="btn-warning btn-small" onclick="exportLog()" title="Export combat log to text file">💾</button>
+                        <button class="btn-danger btn-small" onclick="clearResults()" title="Clear combat log">🗑️</button>
                     </div>
                 </div>
                 <div class="results-container" id="results">
@@ -976,8 +976,8 @@
                 <span class="modal-close" onclick="closeTemplateModal()">×</span>
             </div>
             <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <button class="btn-primary btn-small" onclick="importTemplateJSON()" style="flex: 1;">📥 Import JSON</button>
-                <button class="btn-info btn-small" onclick="exportTemplateJSON()" style="flex: 1;">📤 Export JSON</button>
+                <button class="btn-primary btn-small" onclick="importTemplateJSON()" style="flex: 1;" title="Import attack templates from JSON file">📥 Import JSON</button>
+                <button class="btn-info btn-small" onclick="exportTemplateJSON()" style="flex: 1;" title="Export attack templates to JSON file">📤 Export JSON</button>
             </div>
             <div class="template-list" id="templateList">
                 <div class="empty-state">No templates saved yet</div>
@@ -986,7 +986,7 @@
     </div>
 
     <!-- Floating Action Button (Mobile) -->
-    <button class="floating-action-btn" onclick="rollSelectedAttacks('character'); rollSelectedAttacks('minions')">
+    <button class="floating-action-btn" onclick="rollSelectedAttacks('character'); rollSelectedAttacks('minions')" title="Roll all selected attacks">
         🎲
     </button>
 
@@ -2415,7 +2415,7 @@
                 <div class="damage-components">
                     <h4>
                         <span>Damage</span>
-                        <button class="btn-primary btn-small" onclick="addDamageComponent(${attack.id}, '${attackType}', ${minionId})">+ Add</button>
+                        <button class="btn-primary btn-small" onclick="addDamageComponent(${attack.id}, '${attackType}', ${minionId})" title="Add another damage type to this attack">+ Add</button>
                     </h4>
                     ${attack.damageComponents.length > 0 ? `
                         <div class="damage-component-header">
@@ -2431,18 +2431,20 @@
                                    class="dice-input"
                                    value="${comp.dice}"
                                    placeholder="2d6"
-                                   onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'dice', this.value, '${attackType}', ${minionId})">
+                                   onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'dice', this.value, '${attackType}', ${minionId})"
+                                   title="Damage dice (e.g., 2d6, 1d8+3)">
                             <input type="number"
                                    class="compact-num"
                                    value="${comp.bonus}"
                                    placeholder="+0"
                                    min="-999"
                                    max="999"
-                                   onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'bonus', parseInt(this.value), '${attackType}', ${minionId})">
-                            <select class="damage-type-select" onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'damageType', this.value, '${attackType}', ${minionId})">
+                                   onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'bonus', parseInt(this.value), '${attackType}', ${minionId})"
+                                   title="Damage bonus modifier">
+                            <select class="damage-type-select" onchange="updateDamageComponent(${attack.id}, ${comp.id}, 'damageType', this.value, '${attackType}', ${minionId})" title="Damage type">
                                 ${DAMAGE_TYPES.map(dt => `<option value="${dt}" ${comp.damageType === dt ? 'selected' : ''}>${dt.charAt(0).toUpperCase() + dt.slice(1)}</option>`).join('')}
                             </select>
-                            <button class="btn-danger btn-small" onclick="removeDamageComponent(${attack.id}, ${comp.id}, '${attackType}', ${minionId})">×</button>
+                            <button class="btn-danger btn-small" onclick="removeDamageComponent(${attack.id}, ${comp.id}, '${attackType}', ${minionId})" title="Remove this damage component">×</button>
                         </div>
                     `).join('')}
                 </div>
@@ -2788,10 +2790,10 @@
                         </div>
 
                         <div class="attack-actions" onclick="event.stopPropagation()">
-                            <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'character')">🎲 Roll</button>
-                            <button class="btn-info btn-small" onclick="duplicateCharacterAttack(${attack.id})">📋 Dup</button>
-                            <button class="btn-secondary btn-small" onclick="saveAttackAsTemplate(characterAttacks.find(a => a.id === ${attack.id}), 'character')">💾 Save</button>
-                            <button class="btn-danger btn-small" onclick="removeCharacterAttack(${attack.id})">Remove</button>
+                            <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'character')" title="Roll this attack">🎲 Roll</button>
+                            <button class="btn-info btn-small" onclick="duplicateCharacterAttack(${attack.id})" title="Duplicate this attack">📋 Dup</button>
+                            <button class="btn-secondary btn-small" onclick="saveAttackAsTemplate(characterAttacks.find(a => a.id === ${attack.id}), 'character')" title="Save as template">💾 Save</button>
+                            <button class="btn-danger btn-small" onclick="removeCharacterAttack(${attack.id})" title="Remove this attack">Remove</button>
                         </div>
                     </div>
                 </div>
@@ -3116,20 +3118,20 @@
                                 </div>
 
                                 <div class="attack-actions" onclick="event.stopPropagation()">
-                                    <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'minion', ${minion.id})">🎲 Roll</button>
-                                    <button class="btn-info btn-small" onclick="duplicateMinionAttack(${minion.id}, ${attack.id})">📋 Dup</button>
-                                    <button class="btn-secondary btn-small" onclick="saveAttackAsTemplate(minions.find(m => m.id === ${minion.id}).attacks.find(a => a.id === ${attack.id}), 'minion')">💾 Save</button>
-                                    ${minion.attacks.length > 1 ? `<button class="btn-warning btn-small" onclick="applyToAllInGroup(${minion.id}, ${attack.id})">↓ Apply to All</button>` : ''}
-                                    <button class="btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})">Remove</button>
+                                    <button class="btn-success btn-small" onclick="rollSingleAttack(${attack.id}, 'minion', ${minion.id})" title="Roll this attack">🎲 Roll</button>
+                                    <button class="btn-info btn-small" onclick="duplicateMinionAttack(${minion.id}, ${attack.id})" title="Duplicate this attack">📋 Dup</button>
+                                    <button class="btn-secondary btn-small" onclick="saveAttackAsTemplate(minions.find(m => m.id === ${minion.id}).attacks.find(a => a.id === ${attack.id}), 'minion')" title="Save as template">💾 Save</button>
+                                    ${minion.attacks.length > 1 ? `<button class="btn-warning btn-small" onclick="applyToAllInGroup(${minion.id}, ${attack.id})" title="Copy this attack's stats to all attacks in this minion">↓ Apply to All</button>` : ''}
+                                    <button class="btn-danger btn-small" onclick="removeMinionAttack(${minion.id}, ${attack.id})" title="Remove this attack">Remove</button>
                                 </div>
                             </div>
                         </div>
                     `}).join('')}
 
                     <div style="margin-top: 8px; display: flex; gap: 6px;">
-                        <button class="btn-primary btn-small" style="flex: 1;" onclick="addMinionAttack(${minion.id})">+ Attack</button>
-                        <button class="btn-secondary btn-small" onclick="duplicateMinion(${minion.id})">📋 Duplicate</button>
-                        <button class="btn-danger btn-small" onclick="removeMinion(${minion.id})">Remove</button>
+                        <button class="btn-primary btn-small" style="flex: 1;" onclick="addMinionAttack(${minion.id})" title="Add a new attack to this minion">+ Attack</button>
+                        <button class="btn-secondary btn-small" onclick="duplicateMinion(${minion.id})" title="Duplicate this minion with all attacks">📋 Duplicate</button>
+                        <button class="btn-danger btn-small" onclick="removeMinion(${minion.id})" title="Remove this minion">Remove</button>
                     </div>
                 </div>
             `).join('');
