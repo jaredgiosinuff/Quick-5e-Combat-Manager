@@ -2769,19 +2769,19 @@
                         ${renderDamageComponents(attack, 'character', null)}
 
                         <div class="advantage-selector" onclick="event.stopPropagation()">
-                            <label>
+                            <label title="Roll normally with one d20">
                                 <input type="radio" name="adv-${attack.id}" value="normal"
                                        ${attack.advantage === 'normal' ? 'checked' : ''}
                                        onchange="updateCharacterAttack(${attack.id}, 'advantage', 'normal')">
                                 Normal
                             </label>
-                            <label>
+                            <label title="Roll with advantage (roll two d20s, take the higher)">
                                 <input type="radio" name="adv-${attack.id}" value="advantage"
                                        ${attack.advantage === 'advantage' ? 'checked' : ''}
                                        onchange="updateCharacterAttack(${attack.id}, 'advantage', 'advantage')">
                                 Adv
                             </label>
-                            <label>
+                            <label title="Roll with disadvantage (roll two d20s, take the lower)">
                                 <input type="radio" name="adv-${attack.id}" value="disadvantage"
                                        ${attack.advantage === 'disadvantage' ? 'checked' : ''}
                                        onchange="updateCharacterAttack(${attack.id}, 'advantage', 'disadvantage')">
@@ -3097,19 +3097,19 @@
                                 ${renderDamageComponents(attack, 'minion', minion.id)}
 
                                 <div class="advantage-selector" onclick="event.stopPropagation()">
-                                    <label>
+                                    <label title="Roll normally with one d20">
                                         <input type="radio" name="adv-${minion.id}-${attack.id}" value="normal"
                                                ${attack.advantage === 'normal' ? 'checked' : ''}
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'normal')">
                                         Normal
                                     </label>
-                                    <label>
+                                    <label title="Roll with advantage (roll two d20s, take the higher)">
                                         <input type="radio" name="adv-${minion.id}-${attack.id}" value="advantage"
                                                ${attack.advantage === 'advantage' ? 'checked' : ''}
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'advantage')">
                                         Adv
                                     </label>
-                                    <label>
+                                    <label title="Roll with disadvantage (roll two d20s, take the lower)">
                                         <input type="radio" name="adv-${minion.id}-${attack.id}" value="disadvantage"
                                                ${attack.advantage === 'disadvantage' ? 'checked' : ''}
                                                onchange="updateMinionAttack(${minion.id}, ${attack.id}, 'advantage', 'disadvantage')">
