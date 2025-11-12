@@ -3467,8 +3467,8 @@
             const advantageText = attack.advantage === 'advantage' ? ' (Adv)' :
                                  attack.advantage === 'disadvantage' ? ' (Dis)' : '';
 
-            // Check if attack has no attack roll (auto-hit or save-only)
-            if (attack.noAttackRoll) {
+            // Check if attack has no attack roll (auto-hit, save-only, or 'none' selected)
+            if (attack.noAttackRoll || attack.advantage === 'none') {
                 attackRoll = null;
             } else {
                 if (attack.advantage === 'advantage') {
@@ -3783,9 +3783,11 @@
             const resultClass = isCrit ? 'critical-success' : isFumble ? 'critical-failure' : '';
             const critText = isCrit ? ' 🎯 CRIT!' : isFumble ? ' 💥 MISS!' : '';
 
-            const attackRollDisplay = attackRoll.rolls.length > 1
-                ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
-                : `<span class="dice-result">${attackRoll.rolls[0]}</span>`;
+            const attackRollDisplay = attackRoll
+                ? (attackRoll.rolls.length > 1
+                    ? `[${attackRoll.rolls.map(r => `<span class="dice-result">${r}</span>`).join(' ')}] → <span class="dice-result">${attackRoll.selected}</span>`
+                    : `<span class="dice-result">${attackRoll.rolls[0]}</span>`)
+                : null;
 
             const damageBreakdown = damageResults.map(dr => {
                 const rollsDisplay = dr.rolls.length > 0
