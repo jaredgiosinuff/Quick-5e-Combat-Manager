@@ -911,7 +911,12 @@
 
                 <div id="characterAttacks"></div>
 
-                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addCharacterAttack()">➕ Add Attack</button>
+                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                    <button class="btn-primary" style="flex: 1;" onclick="addCharacterAttack()">➕ Add Attack</button>
+                    <button class="btn-info btn-small" onclick="exportCharacter()">💾</button>
+                    <button class="btn-warning btn-small" onclick="importCharacter()">📥</button>
+                    <button class="btn-danger btn-small" onclick="clearCharacter()">🗑️</button>
+                </div>
 
                 <div class="quick-dice-roller">
                     <h3>Quick Roll</h3>
@@ -939,7 +944,12 @@
 
                 <div id="minions"></div>
 
-                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addMinion()">➕ Add Minion</button>
+                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                    <button class="btn-primary" style="flex: 1;" onclick="addMinion()">➕ Add Minion</button>
+                    <button class="btn-info btn-small" onclick="exportMinions()">💾</button>
+                    <button class="btn-warning btn-small" onclick="importMinions()">📥</button>
+                    <button class="btn-danger btn-small" onclick="clearMinions()">🗑️</button>
+                </div>
             </div>
 
             <!-- Combat Log -->
@@ -1999,9 +2009,29 @@
         // ========================================
 
         function toggleExpand(attackId, type = 'character') {
-            const element = document.querySelector(`[data-attack-id="${attackId}"]`);
-            if (element) {
-                element.classList.toggle('expanded');
+            if (type === 'character') {
+                const attack = characterAttacks.find(a => a.id === attackId);
+                if (attack) {
+                    attack.expanded = !attack.expanded;
+                    const element = document.querySelector(`[data-attack-id="${attackId}"]`);
+                    if (element) {
+                        element.classList.toggle('expanded');
+                    }
+                    saveState();
+                }
+            } else {
+                // For minions, need to find the right minion
+                minions.forEach(minion => {
+                    const attack = minion.attacks.find(a => a.id === attackId);
+                    if (attack) {
+                        attack.expanded = !attack.expanded;
+                        const element = document.querySelector(`[data-attack-id="${attackId}"]`);
+                        if (element) {
+                            element.classList.toggle('expanded');
+                        }
+                        saveState();
+                    }
+                });
             }
         }
 
@@ -2439,7 +2469,7 @@
                 advantage: 'normal',
                 rollCount: 1,
                 selected: false,
-                expanded: false
+                expanded: true
             };
             characterAttacks.push(attack);
             renderCharacterAttacks();
@@ -2502,6 +2532,151 @@
                 minions.forEach(m => m.attacks.forEach(a => a.selected = select));
                 renderMinions();
             }
+            saveState();
+        }
+
+        function exportCharacter() {
+            if (!characterName && characterAttacks.length === 0) {
+                alert('No character data to export!');
+                return;
+            }
+
+            const characterData = {
+                name: characterName,
+                attacks: characterAttacks
+            };
+
+            const json = JSON.stringify(characterData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const filename = characterName ? characterName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'character';
+            a.download = `${filename}-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importCharacter() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        if (!imported.attacks || !Array.isArray(imported.attacks)) {
+                            alert('Invalid character file format!');
+                            return;
+                        }
+
+                        // Update ID counters to avoid conflicts
+                        imported.attacks.forEach(attack => {
+                            attack.id = attackIdCounter++;
+                            if (attack.damageComponents) {
+                                attack.damageComponents.forEach(dc => {
+                                    dc.id = damageComponentIdCounter++;
+                                });
+                            }
+                        });
+
+                        characterName = imported.name || '';
+                        characterAttacks = imported.attacks;
+                        document.getElementById('characterName').value = characterName;
+                        renderCharacterAttacks();
+                        saveState();
+                        alert('Character imported successfully!');
+                    } catch (error) {
+                        alert('Error reading character file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function clearCharacter() {
+            if (!confirm('Are you sure you want to clear all character data? This cannot be undone.')) {
+                return;
+            }
+            characterName = '';
+            characterAttacks = [];
+            document.getElementById('characterName').value = '';
+            renderCharacterAttacks();
+            saveState();
+        }
+
+        function exportMinions() {
+            if (minions.length === 0) {
+                alert('No minions to export!');
+                return;
+            }
+
+            const json = JSON.stringify(minions, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `minions-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importMinions() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        if (!Array.isArray(imported)) {
+                            alert('Invalid minions file format!');
+                            return;
+                        }
+
+                        // Update ID counters to avoid conflicts
+                        imported.forEach(minion => {
+                            minion.id = minionIdCounter++;
+                            if (minion.attacks) {
+                                minion.attacks.forEach(attack => {
+                                    attack.id = attackIdCounter++;
+                                    if (attack.damageComponents) {
+                                        attack.damageComponents.forEach(dc => {
+                                            dc.id = damageComponentIdCounter++;
+                                        });
+                                    }
+                                });
+                            }
+                        });
+
+                        minions = imported;
+                        renderMinions();
+                        saveState();
+                        alert(`Imported ${imported.length} minion(s) successfully!`);
+                    } catch (error) {
+                        alert('Error reading minions file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function clearMinions() {
+            if (!confirm('Are you sure you want to clear all minions? This cannot be undone.')) {
+                return;
+            }
+            minions = [];
+            renderMinions();
             saveState();
         }
 
@@ -2708,7 +2883,7 @@
                         advantage: 'normal',
                         rollCount: 1,
                         selected: false,
-                        expanded: false
+                        expanded: true
                     };
                     minion.attacks.push(attack);
                 }
