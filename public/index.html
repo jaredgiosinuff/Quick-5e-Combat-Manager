@@ -2842,6 +2842,8 @@
             const minion = {
                 id: minionIdCounter++,
                 name: 'Minion',
+                hp: 10,
+                maxHp: 10,
                 attacks: []
             };
             minions.push(minion);
@@ -2861,6 +2863,8 @@
                 const newMinion = {
                     id: minionIdCounter++,
                     name: minion.name + ' (Copy)',
+                    hp: minion.hp || 10,
+                    maxHp: minion.maxHp || 10,
                     attacks: minion.attacks.map(attack => ({
                         ...attack,
                         id: attackIdCounter++,
@@ -3037,11 +3041,31 @@
 
             container.innerHTML = minions.map(minion => `
                 <div class="minion-item">
-                    <input type="text"
-                           value="${minion.name}"
-                           placeholder="Minion Name"
-                           style="margin-bottom: 8px; font-weight: bold;"
-                           onchange="updateMinion(${minion.id}, 'name', this.value)">
+                    <div style="display: flex; gap: 6px; margin-bottom: 8px; align-items: center;">
+                        <input type="text"
+                               value="${minion.name}"
+                               placeholder="Minion Name"
+                               style="flex: 1; font-weight: bold;"
+                               onchange="updateMinion(${minion.id}, 'name', this.value)">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <label style="font-size: 11px; font-weight: bold; color: #666;">HP:</label>
+                            <input type="number"
+                                   value="${minion.hp !== undefined ? minion.hp : 10}"
+                                   placeholder="HP"
+                                   style="width: 50px;"
+                                   min="0"
+                                   max="9999"
+                                   onchange="updateMinion(${minion.id}, 'hp', parseInt(this.value) || 0)">
+                            <span style="font-size: 11px; color: #999;">/</span>
+                            <input type="number"
+                                   value="${minion.maxHp !== undefined ? minion.maxHp : 10}"
+                                   placeholder="Max"
+                                   style="width: 50px;"
+                                   min="1"
+                                   max="9999"
+                                   onchange="updateMinion(${minion.id}, 'maxHp', parseInt(this.value) || 1)">
+                        </div>
+                    </div>
 
                     ${minion.attacks.map(attack => {
                         const damageSummary = getDamageSummary(attack.damageComponents);

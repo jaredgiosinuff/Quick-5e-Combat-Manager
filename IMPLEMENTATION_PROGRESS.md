@@ -59,3 +59,11 @@ All changes automatically persist to localStorage via the existing `saveState()`
    - Added checks to prevent drag operation when mouse is over interactive elements
    - Dragging is now disabled when interacting with: input, textarea, select, button, label elements
    - Users can now freely select and edit text in minion names and attack properties without triggering drag
+
+6. **Hit Points Tracking for Minions**
+   - Added `hp` and `maxHp` fields to minion data structure
+   - Each minion now displays HP / Max HP fields in the header
+   - HP can be manually edited to track damage during combat
+   - Default values: 10 HP / 10 Max HP for new minions
+   - HP fields are preserved when duplicating minions
+   - All HP changes automatically persist to localStorage
