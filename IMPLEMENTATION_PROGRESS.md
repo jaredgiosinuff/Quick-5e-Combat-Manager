@@ -51,3 +51,11 @@ The drag-and-drop implementation uses native HTML5 Drag and Drop API:
 - `dragend`: Cleans up visual states
 
 All changes automatically persist to localStorage via the existing `saveState()` function.
+
+### Bug Fix: Drag Interference with Input Fields
+
+5. **Input Field Interaction Fix**
+   - Fixed issue where dragging interfered with text selection in input fields
+   - Added checks to prevent drag operation when mouse is over interactive elements
+   - Dragging is now disabled when interacting with: input, textarea, select, button, label elements
+   - Users can now freely select and edit text in minion names and attack properties without triggering drag

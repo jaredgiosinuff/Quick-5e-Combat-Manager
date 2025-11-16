@@ -3196,6 +3196,11 @@
                 item.dataset.minionId = minionId;
 
                 item.addEventListener('dragstart', (e) => {
+                    // Prevent dragging when interacting with input fields or buttons
+                    if (e.target.matches('input, textarea, select, button, label')) {
+                        e.preventDefault();
+                        return;
+                    }
                     draggedMinionId = minionId;
                     e.currentTarget.classList.add('dragging');
                     e.dataTransfer.effectAllowed = 'move';
@@ -3250,6 +3255,11 @@
                 item.setAttribute('draggable', true);
 
                 item.addEventListener('dragstart', (e) => {
+                    // Prevent dragging when interacting with input fields or buttons
+                    if (e.target.matches('input, textarea, select, button, label')) {
+                        e.preventDefault();
+                        return;
+                    }
                     draggedAttackId = attackId;
                     draggedAttackMinionId = minionId;
                     e.currentTarget.classList.add('dragging');
@@ -3317,6 +3327,11 @@
                 item.setAttribute('draggable', true);
 
                 item.addEventListener('dragstart', (e) => {
+                    // Prevent dragging when interacting with input fields or buttons
+                    if (e.target.matches('input, textarea, select, button, label')) {
+                        e.preventDefault();
+                        return;
+                    }
                     draggedCharAttackId = attackId;
                     e.currentTarget.classList.add('dragging');
                     e.dataTransfer.effectAllowed = 'move';
