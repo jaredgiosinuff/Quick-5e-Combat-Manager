@@ -346,6 +346,7 @@
             border-radius: 2px;
             margin-bottom: 2px;
             transition: all 0.15s;
+            cursor: move;
         }
 
         .attack-item.selected {
@@ -353,6 +354,14 @@
             border-color: #2a5298;
             border-width: 2px;
             box-shadow: 0 0 0 1px rgba(42, 82, 152, 0.15);
+        }
+
+        .attack-item.dragging {
+            opacity: 0.5;
+        }
+
+        .attack-item.drag-over {
+            border-top: 3px solid #2196f3;
         }
 
         .attack-compact {
@@ -559,6 +568,16 @@
             border-radius: 3px;
             padding: 4px;
             margin-bottom: 4px;
+            cursor: move;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .minion-item.dragging {
+            opacity: 0.5;
+        }
+
+        .minion-item.drag-over {
+            border-top: 3px solid #2196f3;
         }
 
         .result-item {
@@ -762,10 +781,6 @@
                 font-size: 1.1em;
                 flex-direction: column;
                 gap: 10px;
-            }
-
-            .damage-component {
-                grid-template-columns: 1fr;
             }
 
             .batch-controls button {
@@ -2816,6 +2831,7 @@
                 </div>
             `}).join('');
             updateRollButtonCounts();
+            attachCharacterAttackDragHandlers();
         }
 
         // ========================================
@@ -2825,7 +2841,7 @@
         function addMinion() {
             const minion = {
                 id: minionIdCounter++,
-                name: 'Minion Group',
+                name: 'Minion',
                 attacks: []
             };
             minions.push(minion);
@@ -3160,6 +3176,190 @@
                 </div>
             `).join('');
             updateRollButtonCounts();
+            attachMinionDragHandlers();
+        }
+
+        // ========================================
+        // DRAG AND DROP FUNCTIONS
+        // ========================================
+
+        let draggedMinionId = null;
+        let draggedAttackId = null;
+        let draggedAttackMinionId = null;
+
+        function attachMinionDragHandlers() {
+            const minionItems = document.querySelectorAll('.minion-item');
+            minionItems.forEach((item, index) => {
+                const minionId = minions[index].id;
+
+                item.setAttribute('draggable', true);
+                item.dataset.minionId = minionId;
+
+                item.addEventListener('dragstart', (e) => {
+                    draggedMinionId = minionId;
+                    e.currentTarget.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+
+                item.addEventListener('dragend', (e) => {
+                    e.currentTarget.classList.remove('dragging');
+                    document.querySelectorAll('.minion-item').forEach(el => el.classList.remove('drag-over'));
+                    draggedMinionId = null;
+                });
+
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    if (draggedMinionId && draggedMinionId !== minionId) {
+                        e.currentTarget.classList.add('drag-over');
+                    }
+                });
+
+                item.addEventListener('dragleave', (e) => {
+                    e.currentTarget.classList.remove('drag-over');
+                });
+
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.remove('drag-over');
+
+                    if (draggedMinionId && draggedMinionId !== minionId) {
+                        const draggedIndex = minions.findIndex(m => m.id === draggedMinionId);
+                        const targetIndex = minions.findIndex(m => m.id === minionId);
+
+                        if (draggedIndex !== -1 && targetIndex !== -1) {
+                            const [removed] = minions.splice(draggedIndex, 1);
+                            minions.splice(targetIndex, 0, removed);
+                            renderMinions();
+                            saveState();
+                        }
+                    }
+                });
+            });
+
+            attachAttackDragHandlers();
+        }
+
+        function attachAttackDragHandlers() {
+            const attackItems = document.querySelectorAll('.attack-item');
+            attackItems.forEach((item) => {
+                const attackId = parseInt(item.dataset.attackId);
+                const minionItem = item.closest('.minion-item');
+                const minionId = parseInt(minionItem.dataset.minionId);
+
+                item.setAttribute('draggable', true);
+
+                item.addEventListener('dragstart', (e) => {
+                    draggedAttackId = attackId;
+                    draggedAttackMinionId = minionId;
+                    e.currentTarget.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.stopPropagation();
+                });
+
+                item.addEventListener('dragend', (e) => {
+                    e.currentTarget.classList.remove('dragging');
+                    document.querySelectorAll('.attack-item').forEach(el => el.classList.remove('drag-over'));
+                    draggedAttackId = null;
+                    draggedAttackMinionId = null;
+                });
+
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.dataTransfer.dropEffect = 'move';
+
+                    const currentMinionId = parseInt(item.closest('.minion-item').dataset.minionId);
+                    const currentAttackId = parseInt(item.dataset.attackId);
+
+                    if (draggedAttackId && draggedAttackMinionId === currentMinionId && draggedAttackId !== currentAttackId) {
+                        e.currentTarget.classList.add('drag-over');
+                    }
+                });
+
+                item.addEventListener('dragleave', (e) => {
+                    e.currentTarget.classList.remove('drag-over');
+                });
+
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.classList.remove('drag-over');
+
+                    const currentMinionId = parseInt(item.closest('.minion-item').dataset.minionId);
+                    const currentAttackId = parseInt(item.dataset.attackId);
+
+                    if (draggedAttackId && draggedAttackMinionId === currentMinionId && draggedAttackId !== currentAttackId) {
+                        const minion = minions.find(m => m.id === currentMinionId);
+                        if (minion) {
+                            const draggedIndex = minion.attacks.findIndex(a => a.id === draggedAttackId);
+                            const targetIndex = minion.attacks.findIndex(a => a.id === currentAttackId);
+
+                            if (draggedIndex !== -1 && targetIndex !== -1) {
+                                const [removed] = minion.attacks.splice(draggedIndex, 1);
+                                minion.attacks.splice(targetIndex, 0, removed);
+                                renderMinions();
+                                saveState();
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        function attachCharacterAttackDragHandlers() {
+            const attackItems = document.querySelectorAll('#characterAttacks .attack-item');
+            let draggedCharAttackId = null;
+
+            attackItems.forEach((item) => {
+                const attackId = parseInt(item.dataset.attackId);
+
+                item.setAttribute('draggable', true);
+
+                item.addEventListener('dragstart', (e) => {
+                    draggedCharAttackId = attackId;
+                    e.currentTarget.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+
+                item.addEventListener('dragend', (e) => {
+                    e.currentTarget.classList.remove('dragging');
+                    document.querySelectorAll('#characterAttacks .attack-item').forEach(el => el.classList.remove('drag-over'));
+                    draggedCharAttackId = null;
+                });
+
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    const currentAttackId = parseInt(item.dataset.attackId);
+
+                    if (draggedCharAttackId && draggedCharAttackId !== currentAttackId) {
+                        e.currentTarget.classList.add('drag-over');
+                    }
+                });
+
+                item.addEventListener('dragleave', (e) => {
+                    e.currentTarget.classList.remove('drag-over');
+                });
+
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.remove('drag-over');
+                    const currentAttackId = parseInt(item.dataset.attackId);
+
+                    if (draggedCharAttackId && draggedCharAttackId !== currentAttackId) {
+                        const draggedIndex = characterAttacks.findIndex(a => a.id === draggedCharAttackId);
+                        const targetIndex = characterAttacks.findIndex(a => a.id === currentAttackId);
+
+                        if (draggedIndex !== -1 && targetIndex !== -1) {
+                            const [removed] = characterAttacks.splice(draggedIndex, 1);
+                            characterAttacks.splice(targetIndex, 0, removed);
+                            renderCharacterAttacks();
+                            saveState();
+                        }
+                    }
+                });
+            });
         }
 
         // ========================================
@@ -3290,7 +3490,7 @@
                 characterAttacks.push(attack);
                 renderCharacterAttacks();
             } else {
-                // Add to first minion group or create one
+                // Add to first minion or create one
                 if (minions.length === 0) {
                     addMinion();
                 }
